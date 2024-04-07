@@ -21,14 +21,15 @@ function Map() {
   });
 
   return (
+    <Container>
     <ReactMapGL
-      {...viewport}
-      width="100%"
-      height="100%"
+      mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+      initialViewState={viewport}
+      style={{width:'100%', height:'100%'}}
       mapStyle="mapbox://styles/ryanbarouki/clupsf5gr00vl01r2cqvg81tb"
       onViewportChange={setViewport}
-      mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
     />
+    </Container>
   );
 }
 

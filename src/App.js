@@ -12,10 +12,6 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-function formatDistance(distance) {
-  return `${(distance / 1000).toFixed(1)}km`
-}
-
 function App() {
 
   const [guesses, setGuesses] = useState([]);
@@ -24,15 +20,21 @@ function App() {
     longitude: -122.4376,
   });
 
-  const handleGuess = (newGuess) => {
-    setGuesses(guesses => [...guesses, newGuess]);
-    console.log(formatDistance(getDistance(newGuess, answer)));
+  const handleGuess = (newGuess, setClicked) => {
+    setGuesses(guesses => [...guesses, {
+      ...newGuess,
+      distance: getDistance(newGuess, answer)
+    }]);
+    setClicked(false);
   };
 
   return (
     <Container>
       <Map />
-      <GuessMap handleGuess={handleGuess} />
+      <GuessMap
+        handleGuess={handleGuess}
+        guesses={guesses}
+      />
     </Container>
   );
 }

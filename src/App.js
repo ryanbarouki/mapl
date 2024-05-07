@@ -32,7 +32,10 @@ function App() {
 
   return (
     <Container>
-      <Map zoom={zoom} />
+      <Map zoom={zoom}
+        latitude={answer.latitude}
+        longitude={answer.longitude}
+      />
       <GuessMap
         handleGuess={handleGuess}
         guesses={guesses}

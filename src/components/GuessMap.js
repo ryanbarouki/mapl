@@ -2,6 +2,7 @@ import { useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import styled from 'styled-components';
 import ReactMapGL, { Marker } from 'react-map-gl';
+import { HiMapPin } from "react-icons/hi2";
 
 const Button = styled.button`
   padding: 1rem;
@@ -33,6 +34,10 @@ const Map2 = styled.div`
     bottom: 0;
     right: 0;
   }
+`;
+
+const Pin = styled.div`
+  width: 2em;
 `;
 
 function GuessMap({ handleGuess }) {
@@ -69,7 +74,7 @@ function GuessMap({ handleGuess }) {
         onViewportChange={setViewport}
       >
         <Marker latitude={marker.latitude} longitude={marker.longitude}>
-          <div>PIN</div>
+          <HiMapPin size={30} />
         </Marker>
       </ReactMapGL>
       <Button

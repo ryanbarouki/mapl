@@ -19,6 +19,7 @@ function App() {
     latitude: 37.7577,
     longitude: -122.4376,
   });
+  const [zoom, setZoom] = useState(12);
 
   const handleGuess = (newGuess, setClicked) => {
     setGuesses(guesses => [...guesses, {
@@ -26,11 +27,12 @@ function App() {
       distance: getDistance(newGuess, answer)
     }]);
     setClicked(false);
+    setZoom(zoom => zoom - 2)
   };
 
   return (
     <Container>
-      <Map />
+      <Map zoom={zoom} />
       <GuessMap
         handleGuess={handleGuess}
         guesses={guesses}

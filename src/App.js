@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Map from './components/Map.js';
 import GuessMap from './components/GuessMap.js';
 import styled from 'styled-components';
@@ -13,13 +13,24 @@ const Container = styled.div`
 `;
 
 function App() {
-
   const [guesses, setGuesses] = useState([]);
   const [answer, setAnswer] = useState({
     latitude: 37.7577,
     longitude: -122.4376,
   });
   const [zoom, setZoom] = useState(12);
+
+  useEffect(() => {
+    fetch('https://api.3geonames.org/?randomland=yes', {
+      method: 'GET',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
+    })
+      .then(console.log)
+      .catch(console.log);
+  }
+    , []);
 
   const handleGuess = (newGuess, setClicked) => {
     setGuesses(guesses => [...guesses, {

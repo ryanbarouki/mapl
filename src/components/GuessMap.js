@@ -11,7 +11,8 @@ const Button = styled.button`
   color: var(--primary-text);
   font-size: x-large;
   z-index: 20;
-  :active {
+  cursor: pointer;
+  &:active {
     background-color: var(--primary-button-pressed);
   }
   font-family: inherit;
@@ -21,6 +22,8 @@ const Map2 = styled.div`
   position: absolute;
   bottom: -40vh;
   right: -40vw;
+  display: flex;
+  flex-direction: column;
   height: 70vh;
   width: 70vw;
   transition: all 0.5s ease-in-out;
@@ -69,7 +72,9 @@ function GuessMap({ handleGuess }) {
           <div>PIN</div>
         </Marker>
       </ReactMapGL>
-      <Button>Guess</Button>
+      <Button
+        onClick={() => handleGuess(marker)}
+      >Guess</Button>
     </Map2>
   );
 }

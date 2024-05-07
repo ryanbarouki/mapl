@@ -3,6 +3,20 @@ import 'leaflet/dist/leaflet.css';
 import styled from 'styled-components';
 import ReactMapGL, { Marker } from 'react-map-gl';
 
+const Button = styled.button`
+  padding: 1rem;
+  border-radius: 10px;
+  border-width: 0px;
+  background-color: var(--primary-button-unpressed);
+  color: var(--primary-text);
+  font-size: x-large;
+  z-index: 20;
+  :active {
+    background-color: var(--primary-button-pressed);
+  }
+  font-family: inherit;
+`;
+
 const Map2 = styled.div`
   position: absolute;
   bottom: -40vh;
@@ -12,15 +26,14 @@ const Map2 = styled.div`
   transition: all 0.5s ease-in-out;
   z-index: 1;
   
-  &:hover {
+&:hover {
     bottom: 0;
     right: 0;
   }
 `;
 
-function GuessMap() {
+function GuessMap({ handleGuess }) {
 
-  // Define the resizing code
   const [viewport, setViewport] = useState({
     latitude: 37.7577,
     longitude: -122.4376,
@@ -30,7 +43,8 @@ function GuessMap() {
   const [marker, setMarker] = useState({
     latitude: 0,
     longitude: 0,
-  })
+  });
+
 
   const handleClick = (event) => {
     console.log(event);
@@ -55,6 +69,7 @@ function GuessMap() {
           <div>PIN</div>
         </Marker>
       </ReactMapGL>
+      <Button>Guess</Button>
     </Map2>
   );
 }

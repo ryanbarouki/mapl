@@ -1,4 +1,5 @@
 import './App.css';
+import { useState } from 'react';
 import Map from './components/Map.js';
 import GuessMap from './components/GuessMap.js';
 import styled from 'styled-components';
@@ -11,10 +12,17 @@ const Container = styled.div`
 `;
 
 function App() {
+
+  const [guesses, setGuesses] = useState([]);
+
+  const handleGuess = (newGuess) => {
+    setGuesses(guesses => [...guesses, newGuess]);
+  };
+
   return (
     <Container>
       <Map />
-      <GuessMap />
+      <GuessMap handleGuess={handleGuess} />
     </Container>
   );
 }

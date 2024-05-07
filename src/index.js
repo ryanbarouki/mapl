@@ -4,6 +4,24 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { createGlobalStyle } from 'styled-components';
+import { lightTheme } from './theme';
+
+const createCssVar = (items, prefix = '-') =>
+  Object.entries(items).flatMap(([key, value]) => {
+    const varName = `${prefix}-${key}`;
+    if (typeof value === 'object')
+      return createCssVar(value, varName);
+    return `${varName}:${value}`;
+  });
+
+const createCssVars = (colors) => createCssVar(colors).join(';');
+const GlobalStyle = createGlobalStyle`
+  :root {
+    /* We assign variables to root element */
+    ${createCssVars(lightTheme)}
+  }
+`;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

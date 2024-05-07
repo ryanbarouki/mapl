@@ -21,10 +21,10 @@ const Button = styled.button`
 
 const Map2 = styled.div`
   position: absolute;
-  // bottom: -40vh;
-  // right: -40vw;
-  bottom: 0;
-  right: 0;
+  bottom: -40vh;
+  right: -40vw;
+  // bottom: 0;
+  // right: 0;
   display: flex;
   flex-direction: column;
   height: 70vh;

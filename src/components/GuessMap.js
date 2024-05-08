@@ -58,9 +58,9 @@ function formatDistance(distance) {
 function GuessMap({ handleGuess, guesses }) {
 
   const [viewport, setViewport] = useState({
-    latitude: 37.7577,
-    longitude: -122.4376,
-    zoom: 8
+    latitude: 54.5260,
+    longitude: 15.2551,
+    zoom: 2
   });
 
   const [marker, setMarker] = useState({

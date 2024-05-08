@@ -16,9 +16,12 @@ function Map({ zoom, latitude, longitude }) {
       style={{ width: '100%', height: '100%' }}
       mapStyle="mapbox://styles/ryanbarouki/clupsf5gr00vl01r2cqvg81tb"
     >
-      <Marker longitude={longitude} latitude={latitude}>
-        <HiMapPin size={40} color='red' />
-      </Marker>
+      {
+        latitude && longitude &&
+        <Marker longitude={longitude} latitude={latitude}>
+          <HiMapPin size={40} color='red' />
+        </Marker>
+      }
     </ReactMapGL>
   );
 }

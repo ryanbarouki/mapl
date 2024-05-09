@@ -13,23 +13,39 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const EndScreen = styled.div`
+const Screen = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${props => props.end ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0)"};
+  background-color: ${props => props.visible ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0)"};
   position: absolute;
-  z-index: ${props => props.end ? "1000" : "0"};
+  z-index: ${props => props.visible ? "1000" : "0"};
   transition: all 0.3s ease-in;
+`;
+
+const StartScreen = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
 `;
 
 const EndDiv = styled.div`
   color: white;
   font-family: inherit;
   font-size: 90px;
+`;
+
+const Name = styled.h2`
+  color: white;
+  text-align: center;
+  width: 50vw;
 `;
 
 const MAX_GUESSES = 3;
@@ -47,12 +63,14 @@ function App() {
     longitude: 0
   });
   const [zoom, setZoom] = useState(2);
+  const [start, setStart] = useState(false);
   const [end, setEnd] = useState(false);
   const [score, setScore] = useState(0);
+  const [name, setName] = useState("");
 
   useEffect(() => {
     // Generate a random IPv4 address
-    const ipAddress = faker.internet.ip();
+    const ipAddress = faker.internet.ipv4();
 
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${ipAddress}`)
       .then(response => response.json())
@@ -63,7 +81,9 @@ function App() {
           const lon = parseFloat(data[0].lon);
           setZoom(12);
           setAnswer({ latitude: lat, longitude: lon });
-          console.log(data);
+          setName(data[0].display_name)
+          console.log(data[0].display_name);
+          setStart(true);
         }
       })
       .catch(error => console.error('Error fetching location:', error));
@@ -88,10 +108,18 @@ function App() {
 
   return (
     <>
-      <EndScreen end={end}>
+      {!start &&
+        <Screen visible={!start}>
+          <EndDiv>
+            Loading Coordinates...
+          </EndDiv>
+        </Screen>
+      }
+      <Screen visible={end}>
         <EndDiv>Score:</EndDiv>
         <EndDiv>{score}/10000</EndDiv>
-      </EndScreen>
+        <Name>{name}</Name>
+      </Screen>
       <Container>
         <Map zoom={zoom}
           latitude={answer.latitude}

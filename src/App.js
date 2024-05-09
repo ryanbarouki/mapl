@@ -70,20 +70,21 @@ function App() {
 
   useEffect(() => {
     // Generate a random IPv4 address
-    const ipAddress = faker.internet.ipv4();
 
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${ipAddress}`)
+    fetch(`https://40pgjkeu62.execute-api.us-east-2.amazonaws.com/default/getRandomCoords`)
       .then(response => response.json())
       .then(data => {
-        if (data && data.length > 0) {
+        if (data) {
           // Extract latitude and longitude from the response
-          const lat = parseFloat(data[0].lat);
-          const lon = parseFloat(data[0].lon);
+          console.log(data)
+          const lat = parseFloat(data.latitude);
+          const lon = parseFloat(data.longitude);
+          const city = data.city;
           setZoom(12);
           setAnswer({ latitude: lat, longitude: lon });
-          setName(data[0].display_name)
-          console.log(data[0].display_name);
           setStart(true);
+          setName(city)
+          console.log(city);
         }
       })
       .catch(error => console.error('Error fetching location:', error));

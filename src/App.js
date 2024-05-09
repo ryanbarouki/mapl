@@ -13,6 +13,25 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const EndScreen = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: ${props => props.end ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0)"};
+  position: absolute;
+  z-index: ${props => props.end ? "1000" : "0"};
+  transition: all 0.3s ease-in;
+`;
+
+const EndDiv = styled.div`
+  color: white;
+  font-family: inherit;
+  font-size: 90px;
+`;
+
 const MAX_GUESSES = 3;
 const WIN_RADIUS = 50000; //metres
 const MAX_SCORE = 10000;
@@ -60,7 +79,7 @@ function App() {
     }]);
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
-      setScore(calculateScore(distance, num_guesses + 1));
+      setScore(Math.round(calculateScore(distance, num_guesses + 1)));
       console.log(calculateScore(distance, num_guesses + 1))
     }
     setClicked(false);
@@ -68,17 +87,23 @@ function App() {
   };
 
   return (
-    <Container>
-      <Map zoom={zoom}
-        latitude={answer.latitude}
-        longitude={answer.longitude}
-      />
-      <GuessMap
-        handleGuess={handleGuess}
-        guesses={guesses}
-        end={end}
-      />
-    </Container>
+    <>
+      <EndScreen end={end}>
+        <EndDiv>Score:</EndDiv>
+        <EndDiv>{score}/10000</EndDiv>
+      </EndScreen>
+      <Container>
+        <Map zoom={zoom}
+          latitude={answer.latitude}
+          longitude={answer.longitude}
+        />
+        <GuessMap
+          handleGuess={handleGuess}
+          guesses={guesses}
+          end={end}
+        />
+      </Container>
+    </>
   );
 }
 

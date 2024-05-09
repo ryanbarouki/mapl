@@ -113,7 +113,7 @@ function GuessMap({ handleGuess, guesses, end }) {
       </ReactMapGL>
       <Button
         onClick={() => handleGuess(marker, setClicked)}
-        disabled={end === true}
+        disabled={end || !clicked}
       >Guess</Button>
     </Map2>
   );

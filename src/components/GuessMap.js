@@ -16,6 +16,10 @@ const Button = styled.button`
   &:active {
     background-color: var(--primary-button-pressed);
   }
+  &:disabled {
+    cursor: not-allowed;
+    background-color: gray;
+}
   font-family: inherit;
 `;
 
@@ -55,7 +59,7 @@ function formatDistance(distance) {
   return `${(distance / 1000).toFixed(1)}km`
 }
 
-function GuessMap({ handleGuess, guesses }) {
+function GuessMap({ handleGuess, guesses, end }) {
 
   const [viewport, setViewport] = useState({
     latitude: 54.5260,
@@ -90,7 +94,7 @@ function GuessMap({ handleGuess, guesses }) {
         mapStyle="mapbox://styles/ryanbarouki/clvv9mmgd00v101quhx4m3nkv"
         onViewportChange={setViewport}
       >
-        {clicked &&
+        {clicked && !end &&
           <StyledMarker latitude={marker.latitude} longitude={marker.longitude}>
             <HiMapPin size={30} />
             <Dist>&#x200B;</Dist>
@@ -109,6 +113,7 @@ function GuessMap({ handleGuess, guesses }) {
       </ReactMapGL>
       <Button
         onClick={() => handleGuess(marker, setClicked)}
+        disabled={end === true}
       >Guess</Button>
     </Map2>
   );

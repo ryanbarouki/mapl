@@ -13,6 +13,14 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const MAX_GUESSES = 3;
+const WIN_RADIUS = 50000; //metres
+const MAX_SCORE = 10000;
+const MAX_DIST = 4000e3;
+
+const calculateScore = (distance, num_guesses) =>
+  (MAX_SCORE - 1000 * (num_guesses - 1)) * Math.exp(-((distance / MAX_DIST) ** 2))
+
 function App() {
   const [guesses, setGuesses] = useState([]);
   const [answer, setAnswer] = useState({
@@ -20,9 +28,11 @@ function App() {
     longitude: 0
   });
   const [zoom, setZoom] = useState(2);
+  const [end, setEnd] = useState(false);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
-    // Generate a random ($\Rightarrow$) IPv4 address
+    // Generate a random IPv4 address
     const ipAddress = faker.internet.ip();
 
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${ipAddress}`)
@@ -41,12 +51,20 @@ function App() {
   }, []);
 
   const handleGuess = (newGuess, setClicked) => {
+    if (end) return;
+    const distance = getDistance(newGuess, answer);
+    const num_guesses = guesses.length;
     setGuesses(guesses => [...guesses, {
       ...newGuess,
-      distance: getDistance(newGuess, answer)
+      distance: distance
     }]);
+    if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
+      setEnd(true);
+      setScore(calculateScore(distance, num_guesses + 1));
+      console.log(calculateScore(distance, num_guesses + 1))
+    }
     setClicked(false);
-    setZoom(zoom => zoom - 2)
+    setZoom(zoom => zoom - 2);
   };
 
   return (
@@ -58,6 +76,7 @@ function App() {
       <GuessMap
         handleGuess={handleGuess}
         guesses={guesses}
+        end={end}
       />
     </Container>
   );

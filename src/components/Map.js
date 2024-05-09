@@ -9,6 +9,8 @@ function Map({ zoom, latitude, longitude }) {
     <ReactMapGL
       scrollZoom={false}
       dragPan={false}
+      dragRotate={false}
+      touchZoomRotate={false}
       latitude={latitude}
       longitude={longitude}
       zoom={zoom}

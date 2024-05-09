@@ -1,5 +1,6 @@
 # TODO
 - Add a play again button at the end
+- only be able to guess when you've selected a place on the map
 - Add a breakdown at the end
 - Multiple rounds?
 - Sort the globe map out -- should be mercator proj.

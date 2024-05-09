@@ -4,7 +4,6 @@ import Map from './components/Map.js';
 import GuessMap from './components/GuessMap.js';
 import styled from 'styled-components';
 import { getDistance } from 'geolib';
-import { faker } from '@faker-js/faker';
 
 const Container = styled.div`
   width: 100%;
@@ -18,22 +17,12 @@ const Screen = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  ${props => !props.end ? "justify-content: center;" : ""}
   align-items: center;
-  background-color: ${props => props.visible ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0)"};
+  background-color: ${props => props.visible ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0)"};
   position: absolute;
   z-index: ${props => props.visible ? "1000" : "0"};
   transition: all 0.3s ease-in;
-`;
-
-const StartScreen = styled.div`
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
 `;
 
 const EndDiv = styled.div`
@@ -46,6 +35,19 @@ const Name = styled.h2`
   color: white;
   text-align: center;
   width: 50vw;
+`;
+
+const Div = styled.div`
+  color: white;
+  text-align: left;
+  width: auto;
+  position: absolute;
+  z-index: 1;
+  padding: 1rem;
+  font-size: 40px;
+  background-color: var(--primary-button-unpressed);
+  opacity: 0.7;
+
 `;
 
 const MAX_GUESSES = 3;
@@ -104,24 +106,25 @@ function App() {
       console.log(calculateScore(distance, num_guesses + 1))
     }
     setClicked(false);
-    setZoom(zoom => zoom - 2);
+    setZoom(zoom => zoom - 3);
   };
 
   return (
     <>
       {!start &&
-        <Screen visible={!start}>
+        <Screen visible={!start} end={false}>
           <EndDiv>
             Loading Coordinates...
           </EndDiv>
         </Screen>
       }
-      <Screen visible={end}>
+      <Screen visible={end} end={true}>
         <EndDiv>Score:</EndDiv>
         <EndDiv>{score}/10000</EndDiv>
         <Name>{name}</Name>
       </Screen>
       <Container>
+        <Div>Guesses: {guesses.length}/3</Div>
         <Map zoom={zoom}
           latitude={answer.latitude}
           longitude={answer.longitude}

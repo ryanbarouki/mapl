@@ -1,7 +1,5 @@
 # TODO
-- Show map at the end with location of answer
 - Add a play again button at the end
-- Make it clear that user has 3 guesses per round
 - Add error handling for API and timeout
 - Add a breakdown at the end
 - Multiple rounds?

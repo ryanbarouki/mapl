@@ -11,7 +11,6 @@ const Button = styled.button`
   background-color: var(--primary-button-unpressed);
   color: var(--primary-text);
   font-size: x-large;
-  z-index: 20;
   cursor: pointer;
   &:active {
     background-color: var(--primary-button-pressed);
@@ -34,7 +33,6 @@ const Map2 = styled.div`
   height: 70vh;
   width: 70vw;
   transition: all 0.5s ease-in-out;
-  z-index: 1;
   
 &:hover {
     bottom: 0;

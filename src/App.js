@@ -54,10 +54,10 @@ const Div = styled.div`
 const MAX_GUESSES = 3;
 const WIN_RADIUS = 50000; //metres
 const MAX_SCORE = 10000;
-const MAX_DIST = 4000e3;
+const MAX_DIST = 2000e3;
 
 const calculateScore = (distance, num_guesses) =>
-  (MAX_SCORE - 1000 * (num_guesses - 1)) * Math.exp(-((distance / MAX_DIST) ** 2))
+  (MAX_SCORE - 1000 * (num_guesses - 1)) * Math.exp(-((distance / MAX_DIST)))
 
 function App() {
   const [guesses, setGuesses] = useState([]);

@@ -4,6 +4,7 @@ import Map from './components/Map.js';
 import GuessMap from './components/GuessMap.js';
 import styled from 'styled-components';
 import { getDistance } from 'geolib';
+import Papa from 'papaparse';
 
 const Container = styled.div`
   width: 100%;
@@ -71,22 +72,18 @@ function App() {
   const [name, setName] = useState("");
 
   useEffect(() => {
-    // Generate a random IPv4 address
-
-    fetch(`https://40pgjkeu62.execute-api.us-east-2.amazonaws.com/default/getRandomCoords`)
-      .then(response => response.json())
-      .then(data => {
-        if (data) {
+    fetch(`worldcities.csv`)
+      .then(response => response.text())
+      .then(csv => {
+        const places = Papa.parse(csv).data
+        if (places) {
           // Extract latitude and longitude from the response
-          console.log(data)
-          const lat = parseFloat(data.latitude);
-          const lon = parseFloat(data.longitude);
-          const city = data.city;
+          const random_index = Math.floor(Math.random() * places.length);
+          const [city, _, lat, lon, country] = places[random_index]
           setZoom(12);
           setAnswer({ latitude: lat, longitude: lon });
           setStart(true);
-          setName(city)
-          console.log(city);
+          setName(`${city}, ${country}`)
         }
       })
       .catch(error => console.error('Error fetching location:', error));

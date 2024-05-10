@@ -124,7 +124,7 @@ function App() {
         <Name>{name}</Name>
       </Screen>
       <Container>
-        <Div>Guesses: {guesses.length}/3</Div>
+        <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
         <Map zoom={zoom}
           guesses={guesses}
           latitude={answer.latitude}

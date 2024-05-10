@@ -5,6 +5,7 @@ import GuessMap from './components/GuessMap.js';
 import styled from 'styled-components';
 import { getDistance } from 'geolib';
 import Papa from 'papaparse';
+import { useWindowSize } from './Hooks/useWindowSize';
 
 const Container = styled.div`
   width: 100%;
@@ -70,6 +71,7 @@ function App() {
   const [end, setEnd] = useState(false);
   const [score, setScore] = useState(0);
   const [name, setName] = useState("");
+  const [width, height] = useWindowSize();
 
   useEffect(() => {
     fetch(`worldcities.csv`)
@@ -132,6 +134,7 @@ function App() {
           end={end}
         />
         <GuessMap
+          key={`${width}-${height}`}
           handleGuess={handleGuess}
           guesses={guesses}
           end={end}

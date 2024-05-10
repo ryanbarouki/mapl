@@ -60,7 +60,7 @@ export function formatDistance(distance) {
   return `${(distance / 1000).toFixed(1)}km`
 }
 
-function GuessMap({ handleGuess, guesses, end }) {
+function GuessMap({ handleGuess, guesses, end, key }) {
 
   const [viewport, setViewport] = useState({
     latitude: 54.5260,
@@ -88,6 +88,7 @@ function GuessMap({ handleGuess, guesses, end }) {
   return (
     <Map2 >
       <ReactMapGL
+        key={key}
         onClick={handleClick}
         mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
         initialViewState={viewport}

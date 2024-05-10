@@ -6,7 +6,6 @@ import { HiMapPin } from "react-icons/hi2";
 
 const Button = styled.button`
   padding: 1rem;
-  border-radius: 10px;
   border-width: 0px;
   background-color: var(--primary-button-unpressed);
   color: var(--primary-text);
@@ -33,10 +32,14 @@ const Map2 = styled.div`
   height: 70vh;
   width: 70vw;
   transition: all 0.5s ease-in-out;
-  
+  opacity: 0.5;
+  border: solid;
+  border-width: 2px;
+  border-color: var(--primary-button-unpressed);
 &:hover {
     bottom: 0;
     right: 0;
+    opacity: 1;
   }
 `;
 

@@ -16,7 +16,7 @@ function Map({ zoom, latitude, longitude }) {
       zoom={zoom}
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
       style={{ width: '100%', height: '100%' }}
-      mapStyle="mapbox://styles/ryanbarouki/clupsf5gr00vl01r2cqvg81tb"
+      mapStyle="mapbox://styles/ryanbarouki/clvv9mmgd00v101quhx4m3nkv"
     >
       {
         latitude && longitude &&

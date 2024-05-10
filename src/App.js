@@ -102,6 +102,7 @@ function App() {
     }]);
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
+      setZoom(5);
       setScore(Math.round(calculateScore(distance, num_guesses + 1)));
       console.log(calculateScore(distance, num_guesses + 1))
     }

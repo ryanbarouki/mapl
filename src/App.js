@@ -102,12 +102,14 @@ function App() {
     }]);
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
-      setZoom(5);
+      setZoom(2);
       setScore(Math.round(calculateScore(distance, num_guesses + 1)));
       console.log(calculateScore(distance, num_guesses + 1))
     }
+    else {
+      setZoom(zoom => zoom - 3);
+    }
     setClicked(false);
-    setZoom(zoom => zoom - 3);
   };
 
   return (
@@ -127,8 +129,10 @@ function App() {
       <Container>
         <Div>Guesses: {guesses.length}/3</Div>
         <Map zoom={zoom}
+          guesses={guesses}
           latitude={answer.latitude}
           longitude={answer.longitude}
+          end={end}
         />
         <GuessMap
           handleGuess={handleGuess}

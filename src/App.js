@@ -89,7 +89,11 @@ function App() {
           setName(`${city}, ${country}`)
         }
       })
-      .catch(error => console.error('Error fetching location:', error));
+      .catch(error => {
+        console.error('Error fetching location:', error);
+        // try again
+        window.location.reload();
+      });
   }, []);
 
   const handleGuess = (newGuess, setClicked) => {

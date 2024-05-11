@@ -47,7 +47,7 @@ const Div = styled.div`
   position: absolute;
   z-index: 1;
   padding: 1rem;
-  font-size: 40px;
+  font-size: 1.5rem;
   background-color: var(--primary-button-unpressed);
   opacity: 0.7;
 

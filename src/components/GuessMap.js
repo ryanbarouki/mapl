@@ -3,23 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import styled from 'styled-components';
 import ReactMapGL, { Marker } from 'react-map-gl';
 import { HiMapPin } from "react-icons/hi2";
-
-const Button = styled.button`
-  padding: 1rem;
-  border-width: 0px;
-  background-color: var(--primary-button-unpressed);
-  color: var(--primary-text);
-  font-size: x-large;
-  cursor: pointer;
-  &:active {
-    background-color: var(--primary-button-pressed);
-  }
-  &:disabled {
-    cursor: not-allowed;
-    background-color: gray;
-}
-  font-family: inherit;
-`;
+import { Button } from '../globalStyles';
 
 const Map2 = styled.div`
   position: absolute;

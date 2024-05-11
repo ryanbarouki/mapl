@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { getDistance } from 'geolib';
 import Papa from 'papaparse';
 import { useWindowSize } from './Hooks/useWindowSize';
+import { Button } from './globalStyles';
 
 const Container = styled.div`
   width: 100%;
@@ -21,7 +22,7 @@ const Screen = styled.div`
   flex-direction: column;
   ${props => !props.end ? "justify-content: center;" : ""}
   align-items: center;
-  background-color: ${props => props.visible ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0)"};
+  background-color: ${props => props.visible ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)"};
   position: absolute;
   z-index: ${props => props.visible ? "1000" : "0"};
   transition: all 0.3s ease-in;
@@ -124,6 +125,7 @@ function App() {
         <EndDiv>Score:</EndDiv>
         <EndDiv>{score}/10000</EndDiv>
         <Name>{name}</Name>
+        <Button onClick={() => window.location.reload()}>Play again</Button>
       </Screen>
       <Container>
         <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>

@@ -25,6 +25,11 @@ const Map2 = styled.div`
     right: 0;
     opacity: 1;
   }
+&:active {
+    bottom: 0;
+    right: 0;
+    opacity: 1;
+  }
 `;
 
 const StyledMarker = styled(Marker)`

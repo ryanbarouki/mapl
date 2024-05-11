@@ -1,5 +1,4 @@
 # TODO
-- Map to not minimise when dragging
 - How to play
 - Do a daily guess + regular
 - Share feature

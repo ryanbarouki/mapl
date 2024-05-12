@@ -1,5 +1,4 @@
 # TODO
-- How to play
 - Multiple rounds
 - Do a daily guess + regular
 - Share feature

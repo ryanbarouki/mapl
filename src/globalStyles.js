@@ -5,7 +5,7 @@ export const Button = styled.button`
   border-width: 0px;
   background-color: var(--primary-button-unpressed);
   color: var(--primary-text);
-  font-size: x-large;
+  font-size: 1.5rem;
   cursor: pointer;
   z-index: 1;
   &:active {

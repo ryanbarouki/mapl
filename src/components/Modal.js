@@ -15,11 +15,16 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background-color: white;
+  background-color: var(--primary-background);
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  width: clamp(200px, 70vw, 500px);
+  gap: 1rem;
 `;
 
 const Modal = ({ isOpen, onClose, children }) => {

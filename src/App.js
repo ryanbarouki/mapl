@@ -31,7 +31,8 @@ const Screen = styled.div`
 const EndDiv = styled.div`
   color: white;
   font-family: inherit;
-  font-size: 5rem;
+  font-size: 3rem;
+  text-align: center;
 `;
 
 const Name = styled.h2`

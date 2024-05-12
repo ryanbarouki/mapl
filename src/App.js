@@ -7,6 +7,7 @@ import { getDistance } from 'geolib';
 import Papa from 'papaparse';
 import { useWindowSize } from './Hooks/useWindowSize';
 import { Button } from './globalStyles';
+import Modal from './components/Modal';
 
 const Container = styled.div`
   width: 100%;
@@ -45,13 +46,19 @@ const Div = styled.div`
   color: white;
   text-align: left;
   width: auto;
-  position: absolute;
   z-index: 1;
   padding: 1rem;
   font-size: 1.5rem;
   background-color: var(--primary-button-unpressed);
-  opacity: 0.7;
 
+`;
+
+const TopBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  position: absolute;
+  width: 100vw;
 `;
 
 const MAX_GUESSES = 3;
@@ -74,6 +81,7 @@ function App() {
   const [score, setScore] = useState(0);
   const [name, setName] = useState("");
   const [width, height] = useWindowSize();
+  const [openHowTo, setOpenHowTo] = useState(false);
 
   useEffect(() => {
     fetch(`worldcities.csv`)
@@ -137,7 +145,15 @@ function App() {
         }
       </Screen>
       <Container>
-        <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
+        <TopBar>
+          <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
+          <Button onClick={() => setOpenHowTo(true)}>How to play</Button>
+        </TopBar>
+        <Modal isOpen={openHowTo}
+          onClose={() => setOpenHowTo(false)}
+        >
+          <div>Test test</div>
+        </Modal>
         <Map zoom={zoom}
           guesses={guesses}
           latitude={answer.latitude}

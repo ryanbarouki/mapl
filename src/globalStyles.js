@@ -7,6 +7,7 @@ export const Button = styled.button`
   color: var(--primary-text);
   font-size: x-large;
   cursor: pointer;
+  z-index: 1;
   &:active {
     background-color: var(--primary-button-pressed);
   }

@@ -1,4 +1,7 @@
 # TODO
+- Scale marker on map
+- Analytics
+- Ads when API requests start to charge $$
 - Multiple rounds
 - Do a daily guess + regular
 - Share feature

@@ -80,6 +80,8 @@ function GuessMap({ handleGuess, guesses, end, key }) {
         key={key}
         onClick={handleClick}
         mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+        dragRotate={false}
+        touchZoomRotate={false}
         initialViewState={viewport}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/ryanbarouki/clvv9mmgd00v101quhx4m3nkv"

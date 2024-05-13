@@ -3,7 +3,6 @@ Play at [mapl.life](https://mapl.life)
 
 ## Dev TODOs
 - Scale marker on map
-- Analytics
 - Ads when API requests start to charge $$
 - Multiple rounds
 - Do a daily guess + regular

@@ -7,11 +7,10 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 
 const Container = styled.div`
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  flex: 1 0 auto;
 `;
 
 const Logo = styled.img`
@@ -46,24 +45,22 @@ const IconContainer = styled.div`
 function App() {
 
   return (
-    <>
-      <Container>
+    <Container>
+      <Link to="/" style={{ textDecoration: "none" }}>
+      </Link>
+      <IconContainer>
         <Link to="/" style={{ textDecoration: "none" }}>
+          <Home />
         </Link>
-        <IconContainer>
-          <Link to="/" style={{ textDecoration: "none" }}>
-            <Home />
-          </Link>
-          <Link to="/contact" style={{ textDecoration: "none" }}>
-            <Stats />
-          </Link>
-          <Link to="/privacy" style={{ textDecoration: "none" }}>
-            <Info />
-          </Link>
-        </IconContainer>
-        <Main></Main>
-      </Container>
-    </>
+        <Link to="/about" style={{ textDecoration: "none" }}>
+          <Stats />
+        </Link>
+        <Link to="/privacy" style={{ textDecoration: "none" }}>
+          <Info />
+        </Link>
+      </IconContainer>
+      <Main></Main>
+    </Container>
   );
 }
 

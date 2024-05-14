@@ -8,6 +8,15 @@ import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
 import Modal from './Modal';
 
+const PlayContainer = styled.div`
+  width: 100%;
+  height: 90vh;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+`;
+
 const Container = styled.div`
   width: 100%;
   height: 100vh;
@@ -24,7 +33,7 @@ const Screen = styled.div`
   align-items: center;
   background-color: ${props => props.visible ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)"};
   position: absolute;
-  z-index: ${props => props.visible ? "1000" : "0"};
+  z-index: ${props => props.visible ? "1000" : "-1"};
   transition: all 0.3s ease-in;
 `;
 
@@ -141,7 +150,7 @@ function Play() {
   };
 
   return (
-    <>
+    <PlayContainer>
       {!start &&
         <Screen visible={!start} end={false}>
           <EndDiv>
@@ -196,7 +205,7 @@ function Play() {
           end={end}
         />
       </Container>
-    </>
+    </PlayContainer>
   );
 }
 

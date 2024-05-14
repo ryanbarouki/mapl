@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { createGlobalStyle } from 'styled-components';
 import { lightTheme } from './theme';
+import { BrowserRouter } from 'react-router-dom';
 
 const createCssVar = (items, prefix = '-') =>
   Object.entries(items).flatMap(([key, value]) => {
@@ -25,10 +26,10 @@ const GlobalStyle = createGlobalStyle`
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  <BrowserRouter>
     <GlobalStyle />
     <App />
-  </React.StrictMode>
+  </BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

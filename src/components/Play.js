@@ -6,16 +6,7 @@ import { getDistance } from 'geolib';
 import Papa from 'papaparse';
 import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
-import Modal from './Modal';
-
-const PlayContainer = styled.div`
-  width: 100%;
-  height: 100%
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-`;
+import HowToPlay from './HowToPlay.js';
 
 const Container = styled.div`
   width: 100%;
@@ -70,20 +61,6 @@ const TopBar = styled.div`
   width: 100vw;
 `;
 
-const P = styled.div`
-  font-size: 1.2rem;
-  color: white;
-  
-  strong{
-    color: var(--primary-highlight);
-  }
-`;
-
-const Title = styled.div`
-    color: var(--primary-highlight);
-    font-size: 2em;
-    font-weight: bold;
-`;
 
 const MAX_GUESSES = 3;
 const WIN_RADIUS = 50000; //metres
@@ -150,7 +127,7 @@ function Play() {
   };
 
   return (
-    <PlayContainer>
+    <>
       {!start &&
         <Screen visible={!start} end={false}>
           <EndDiv>
@@ -171,27 +148,10 @@ function Play() {
       <Container>
         <TopBar>
           <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
-          <Button onClick={() => setOpenHowTo(true)}>How to play</Button>
         </TopBar>
-        <Modal isOpen={openHowTo}
+        <HowToPlay isOpen={openHowTo}
           onClose={() => setOpenHowTo(false)}
-        >
-          <Title>How to play Mapl!</Title>
-          <P>Welcome to the <strong>Mapl</strong> - the redacted map game!
-            Your challenge is to identify the location marked on the redacted map.
-            You'll have <strong>three attempts</strong> to pinpoint the marker's exact location.
-            With each incorrect guess, <strong>the map zooms out</strong>, making the task slightly easier.
-          </P>
-          <P>
-            Keep in mind that precision matters!
-            If you can guess <strong>within 50km</strong> of the actual location at any point,
-            you'll earn an automatic score!
-          </P>
-          <P>
-            Strive for the highest score possible – a <strong>maximum of 10,000 points</strong>  is up for grabs.
-            Aim to get as close to the mark as you can, using as few guesses as possible.
-          </P>
-        </Modal>
+        />
         <Map zoom={zoom}
           guesses={guesses}
           latitude={answer.latitude}
@@ -205,7 +165,7 @@ function Play() {
           end={end}
         />
       </Container>
-    </PlayContainer>
+    </>
   );
 }
 

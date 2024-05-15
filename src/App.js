@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
+import HowToPlay from './components/HowToPlay';
+import { useState } from 'react';
 
 const Container = styled.div`
   width: 100%;
@@ -16,11 +18,10 @@ const Container = styled.div`
 const Logo = styled.img`
   height: 3rem;
   pointer-events: none;
-  margin-top: 1rem;
 `;
 
 const IconStyle = css`
-  color: #FC8B9D;
+  color: var(--primary-highlight);
   margin-top: 10px;
 `;
 
@@ -50,24 +51,30 @@ const Bar = styled.div`
   padding: 1rem;
 `;
 
+const NavItem = styled.div`
+  cursor: pointer;
+`;
+
 function App() {
+  const [openHowTo, setOpenHowTo] = useState(false);
 
   return (
     <Container>
+      <HowToPlay isOpen={openHowTo}
+        onClose={() => setOpenHowTo(false)}
+      />
       <Link to="/" style={{ textDecoration: "none" }}>
       </Link>
       <Bar>
         <Logo src={maplLogo} />
         <IconContainer>
           <Link to="/" style={{ textDecoration: "none" }}>
-            <Home />
+            Play
           </Link>
           <Link to="/about" style={{ textDecoration: "none" }}>
-            <Stats />
+            About
           </Link>
-          <Link to="/privacy" style={{ textDecoration: "none" }}>
-            <Info />
-          </Link>
+          <NavItem onClick={() => setOpenHowTo(true)}>How to Play</NavItem>
         </IconContainer>
       </Bar>
       <Main></Main>

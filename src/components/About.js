@@ -10,7 +10,7 @@ function About() {
     <Container>
       <h2>About Mapl</h2>
       <p>I'm a PhD student who likes to make web games!</p>
-      <p>The game was inspired by geoguessr, timeguessr and a picture frame of a redacted map of Hadrian's wall
+      <p>Mapl was inspired by geoguessr, timeguessr and a picture frame of a redacted map of Hadrian's wall
         my friend passed around at a party.</p>
       <p>I want to keep the game free but map APIs are not free so I may need to put ads on it at some point!</p>
       <p>Alternatively you could donate directly: </p>

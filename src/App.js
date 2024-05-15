@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 import { Main } from './components/Main';
-// import maplLogo from '../maplLogo.svg';
+import maplLogo from './mapl_logo.svg';
 import { Link } from 'react-router-dom';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import HomeIcon from '@mui/icons-material/Home';
@@ -42,23 +42,34 @@ const IconContainer = styled.div`
   gap: 1rem;
 `;
 
+const Bar = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+`;
+
 function App() {
 
   return (
     <Container>
       <Link to="/" style={{ textDecoration: "none" }}>
       </Link>
-      <IconContainer>
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <Home />
-        </Link>
-        <Link to="/about" style={{ textDecoration: "none" }}>
-          <Stats />
-        </Link>
-        <Link to="/privacy" style={{ textDecoration: "none" }}>
-          <Info />
-        </Link>
-      </IconContainer>
+      <Bar>
+        <Logo src={maplLogo} />
+        <IconContainer>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <Home />
+          </Link>
+          <Link to="/about" style={{ textDecoration: "none" }}>
+            <Stats />
+          </Link>
+          <Link to="/privacy" style={{ textDecoration: "none" }}>
+            <Info />
+          </Link>
+        </IconContainer>
+      </Bar>
       <Main></Main>
     </Container>
   );

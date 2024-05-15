@@ -10,11 +10,11 @@ import Modal from './Modal';
 
 const PlayContainer = styled.div`
   width: 100%;
-  height: 90vh;
+  height: 100%
   bottom: 0;
   display: flex;
   flex-direction: column;
-  position: fixed;
+  overflow-x: hidden;
 `;
 
 const Container = styled.div`

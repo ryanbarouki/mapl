@@ -53,6 +53,11 @@ const Bar = styled.div`
 
 const NavItem = styled.div`
   cursor: pointer;
+  font-family: BRShape;
+  color: black;
+  &:hover {
+    color: var(--primary-highlight);
+  }
 `;
 
 function App() {
@@ -63,16 +68,20 @@ function App() {
       <HowToPlay isOpen={openHowTo}
         onClose={() => setOpenHowTo(false)}
       />
-      <Link to="/" style={{ textDecoration: "none" }}>
-      </Link>
       <Bar>
-        <Logo src={maplLogo} />
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <Logo src={maplLogo} />
+        </Link>
         <IconContainer>
-          <Link to="/" style={{ textDecoration: "none" }}>
-            Play
+          <Link to="/play" style={{ textDecoration: "none" }}>
+            <NavItem>
+              Play
+            </NavItem>
           </Link>
           <Link to="/about" style={{ textDecoration: "none" }}>
-            About
+            <NavItem>
+              About
+            </NavItem>
           </Link>
           <NavItem onClick={() => setOpenHowTo(true)}>How to Play</NavItem>
         </IconContainer>

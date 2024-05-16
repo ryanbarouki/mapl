@@ -3,11 +3,13 @@ import Play from './Play';
 import About from './About';
 import CookiePolicy from './CookiePolicy';
 import PrivacyPolicy from './PrivacyPolicy';
+import Home from './Home';
 
 export const Main = () => {
   return (
     <Routes>
-      <Route exact path='/' element={<Play />}></Route>
+      <Route exact path='/' element={<Home />}></Route>
+      <Route exact path='/play' element={<Play />}></Route>
       <Route exact path='/about' element={<About />}></Route>
       <Route exact path='/cookies' element={<CookiePolicy />}></Route>
       <Route exact path='/privacy' element={<PrivacyPolicy />}></Route>

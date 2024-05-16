@@ -10,22 +10,23 @@ import HowToPlay from './HowToPlay.js';
 
 const Container = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 `;
 
 const Screen = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   ${props => !props.end ? "justify-content: center;" : ""}
   align-items: center;
   background-color: ${props => props.visible ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)"};
-  position: absolute;
+  position: fixed;
   z-index: ${props => props.visible ? "1000" : "-1"};
   transition: all 0.3s ease-in;
+  overflow: hidden;
 `;
 
 const EndDiv = styled.div`

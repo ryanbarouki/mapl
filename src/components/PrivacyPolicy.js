@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 const Container = styled.div`
   padding: 2rem;
-  overflow: scroll;
   font-family: BRShape;
 `;
 

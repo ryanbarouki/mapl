@@ -136,16 +136,14 @@ function Play() {
             </EndDiv>
           </Screen>
         }
-        <Screen visible={end} end={true}>
-          {end &&
-            <>
-              <EndDiv>Score:</EndDiv>
-              <EndDiv>{score}/10000</EndDiv>
-              <Name>{name}</Name>
-              <Button onClick={() => window.location.reload()}>Play again</Button>
-            </>
-          }
-        </Screen>
+        {end &&
+          <Screen visible={end} end={true}>
+            <EndDiv>Score:</EndDiv>
+            <EndDiv>{score}/10000</EndDiv>
+            <Name>{name}</Name>
+            <Button onClick={() => window.location.reload()}>Play again</Button>
+          </Screen>
+        }
         <TopBar>
           <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
         </TopBar>

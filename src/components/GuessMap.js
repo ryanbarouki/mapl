@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import styled from 'styled-components';
 //import ReactMapGL, { Marker } from 'react-map-gl';
@@ -10,6 +10,7 @@ import { MapContainer, Marker, Tooltip } from 'react-leaflet'
 import { TileLayer } from 'react-leaflet';
 import { useMapEvents } from 'react-leaflet/hooks'
 import L from 'leaflet'
+import { useRef } from 'react';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -21,14 +22,14 @@ L.Icon.Default.mergeOptions({
 
 const Map2 = styled.div`
   position: absolute;
-  bottom: -40vh;
-  right: -40vw;
-  // bottom: 0;
-  // right: 0;
+  // bottom: -40vh;
+  // right: -40vw;
+  bottom: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  height: 70vh;
-  width: 70vw;
+  height: 30vh;
+  width: 30vw;
   transition: all 0.5s ease-in-out;
   opacity: 0.5;
   border: solid;
@@ -38,6 +39,8 @@ const Map2 = styled.div`
     bottom: 0;
     right: 0;
     opacity: 1;
+    height: 70vh;
+    width: 70vw;
   }
 &:active {
     bottom: 0;
@@ -65,12 +68,15 @@ export function formatDistance(distance) {
 
 function MapEvents({ handleClick }) {
   const map = useMapEvents({
-    click: handleClick
+    click: handleClick,
   })
   return null
 }
 
 function GuessMap({ handleGuess, guesses, end, key }) {
+
+  const mapRef = useRef(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   const handleClick = (event) => {
     console.log(event)
@@ -95,11 +101,24 @@ function GuessMap({ handleGuess, guesses, end, key }) {
 
   const [clicked, setClicked] = useState(false);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [mapLoaded]);
+
   return (
-    <Map2 >
+    <Map2
+      onMouseEnter={() => setMapLoaded(true)}
+    >
       <MapContainer
         key={key}
-        style={{ height: "100vh" }}
+        ref={mapRef}
+        style={{ height: "100%" }}
         center={[viewport.latitude, viewport.longitude]}
         zoom={viewport.zoom}
         minZoom={3}

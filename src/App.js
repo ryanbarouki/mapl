@@ -52,6 +52,7 @@ const Bar = styled.div`
 `;
 
 const NavItem = styled.div`
+  text-align: center;
   cursor: pointer;
   font-family: BRShape;
   color: black;

@@ -128,24 +128,24 @@ function Play() {
 
   return (
     <>
-      {!start &&
-        <Screen visible={!start} end={false}>
-          <EndDiv>
-            Loading Coordinates...
-          </EndDiv>
-        </Screen>
-      }
-      <Screen visible={end} end={true}>
-        {end &&
-          <>
-            <EndDiv>Score:</EndDiv>
-            <EndDiv>{score}/10000</EndDiv>
-            <Name>{name}</Name>
-            <Button onClick={() => window.location.reload()}>Play again</Button>
-          </>
-        }
-      </Screen>
       <Container>
+        {!start &&
+          <Screen visible={!start} end={false}>
+            <EndDiv>
+              Loading Coordinates...
+            </EndDiv>
+          </Screen>
+        }
+        <Screen visible={end} end={true}>
+          {end &&
+            <>
+              <EndDiv>Score:</EndDiv>
+              <EndDiv>{score}/10000</EndDiv>
+              <Name>{name}</Name>
+              <Button onClick={() => window.location.reload()}>Play again</Button>
+            </>
+          }
+        </Screen>
         <TopBar>
           <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
         </TopBar>

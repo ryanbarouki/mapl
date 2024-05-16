@@ -14,10 +14,11 @@ const lightPalette = {
   primary: {
     300: '#ffffff',
     400: '#414244',
-    500: '#D0A600',
+    500: '#f8c600ff',
     600: '#735C00',
     700: '#cecece',
     800: '#FFCB00',
+    900: '#dfb100',
   },
   secondary: {
     300: '#2A2A2B',
@@ -34,6 +35,7 @@ export const lightTheme = {
     button: {
       unpressed: lightPalette.primary[500],
       pressed: lightPalette.primary[600],
+      hover: lightPalette.primary[900],
     }
   },
   secondary: {

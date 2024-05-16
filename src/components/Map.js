@@ -20,6 +20,11 @@ const Dist = styled.div`
 function Map({ zoom, latitude, longitude, guesses, end }) {
 
   return (
+
+    // <img
+    //   src={`https://api.mapbox.com/styles/v1/ryanbarouki/clupsf5gr00vl01r2cqvg81tb/static/pin-l-embassy+f74e4e(${longitude},${latitude})/${longitude},${latitude},${zoom}/${1280}x${1280}@2x?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`}
+    // />
+
     <ReactMapGL
       scrollZoom={false}
       dragPan={false}

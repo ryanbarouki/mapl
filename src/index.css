@@ -5,12 +5,28 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  position: fixed;
   height: 100%;
   width: 100%;
+  position: fixed;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+#map {
+  width: 100%;
+  height: 600px;
+}
+
+@font-face {
+  font-family: 'BRShape';
+  font-weight: 900;
+  src: local('BRShape'), url(./fonts/BRShape-Super.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'BRShape';
+  src: local('BRShape'), url(./fonts/BRShape-Light.otf) format('opentype');
 }

@@ -2,6 +2,9 @@
 Play at [mapl.life](https://mapl.life)
 
 ## Dev TODOs
+- nav bar collapse when small
+- make sure new map will work on live website
+
 - Scale marker on map
 - Ads when API requests start to charge $$
 - Multiple rounds

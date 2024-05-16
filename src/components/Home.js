@@ -20,6 +20,7 @@ const Options = styled.div`
   justify-content: center;
   align-items: center;
   gap: 3rem;
+  height: 100%;
 
   @media only screen and (max-width: 800px) {
     flex-direction: column;

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import Map from './Map.js';
-import GuessMap from './GuessMap.js';
+import ViewMap from './Map.js';
+//import GuessMap from './GuessMap.js';
 import styled from 'styled-components';
 import { getDistance } from 'geolib';
 import Papa from 'papaparse';
 import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
 import HowToPlay from './HowToPlay.js';
-import NewMap from './NewMap.js';
+import NewGuessMap from './NewGuessMap.js';
 
 const Container = styled.div`
   width: 100%;
@@ -95,7 +95,7 @@ function Play() {
           // Extract latitude and longitude from the response
           const random_index = Math.floor(Math.random() * places.length);
           const [city, _, lat, lon, country] = places[random_index]
-          setZoom(12);
+          setZoom(11);
           setAnswer({ latitude: lat, longitude: lon });
           setStart(true);
           setName(`${city}, ${country}`)
@@ -118,12 +118,12 @@ function Play() {
     }]);
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
-      setZoom(2);
+      setZoom(3);
       setScore(Math.round(calculateScore(distance, num_guesses + 1)));
       console.log(calculateScore(distance, num_guesses + 1))
     }
     else {
-      setZoom(zoom => zoom - 3);
+      setZoom(zoom => zoom - 2);
     }
     setClicked(false);
   };
@@ -152,26 +152,33 @@ function Play() {
         <HowToPlay isOpen={openHowTo}
           onClose={() => setOpenHowTo(false)}
         />
-        <NewMap
-          key={zoom}
+        {/* <NewMap */}
+        {/*   key={zoom} */}
+        {/*   zoom={zoom} */}
+        {/*   guesses={guesses} */}
+        {/*   latitude={answer.latitude} */}
+        {/*   longitude={answer.longitude} */}
+        {/*   end={end} */}
+        {/* /> */}
+        <ViewMap
           zoom={zoom}
           guesses={guesses}
           latitude={answer.latitude}
           longitude={answer.longitude}
           end={end}
         />
-        {/* <Map zoom={zoom} */}
-        {/*   guesses={guesses} */}
-        {/*   latitude={answer.latitude} */}
-        {/*   longitude={answer.longitude} */}
-        {/*   end={end} */}
-        {/* /> */}
-        <GuessMap
+        <NewGuessMap
           key={`${width}-${height}`}
           handleGuess={handleGuess}
           guesses={guesses}
           end={end}
         />
+        {/* <GuessMap */}
+        {/*   key={`${width}-${height}`} */}
+        {/*   handleGuess={handleGuess} */}
+        {/*   guesses={guesses} */}
+        {/*   end={end} */}
+        {/* /> */}
       </Container>
     </>
   );

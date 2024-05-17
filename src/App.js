@@ -13,6 +13,8 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+  bottom: 0;
 `;
 
 const Logo = styled.img`

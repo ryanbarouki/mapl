@@ -35,6 +35,7 @@ const Map2 = styled.div`
   border: solid;
   border-width: 2px;
   border-color: var(--primary-button-unpressed);
+  z-index: 10000;
 &:hover {
     bottom: 0;
     right: 0;

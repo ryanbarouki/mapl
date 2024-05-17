@@ -7,6 +7,7 @@ import Papa from 'papaparse';
 import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
 import HowToPlay from './HowToPlay.js';
+import NewMap from './NewMap.js';
 
 const Container = styled.div`
   width: 100%;
@@ -151,12 +152,20 @@ function Play() {
         <HowToPlay isOpen={openHowTo}
           onClose={() => setOpenHowTo(false)}
         />
-        <Map zoom={zoom}
+        <NewMap
+          key={zoom}
+          zoom={zoom}
           guesses={guesses}
           latitude={answer.latitude}
           longitude={answer.longitude}
           end={end}
         />
+        {/* <Map zoom={zoom} */}
+        {/*   guesses={guesses} */}
+        {/*   latitude={answer.latitude} */}
+        {/*   longitude={answer.longitude} */}
+        {/*   end={end} */}
+        {/* /> */}
         <GuessMap
           key={`${width}-${height}`}
           handleGuess={handleGuess}

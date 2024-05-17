@@ -25,6 +25,7 @@ const ModalContent = styled.div`
   justify-content: left;
   width: clamp(200px, 70vw, 500px);
   gap: 1rem;
+  font-family: BRShape;
 `;
 
 const Modal = ({ isOpen, onClose, children }) => {

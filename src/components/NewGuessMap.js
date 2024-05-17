@@ -56,10 +56,12 @@ const MapWrap = styled.div`
     bottom: 0;
     right: 0;
     opacity: 1;
+    height: 70vh;
+    width: 70vw;
   }
 `;
 
-export default function NewGuessMap({ handleGuess, guesses, end, key }) {
+export default function NewGuessMap({ handleGuess, guesses, end }) {
 
   const [clicked, setClicked] = useState(false);
 
@@ -87,7 +89,7 @@ export default function NewGuessMap({ handleGuess, guesses, end, key }) {
           latitude: 49.2125578,
           zoom: 2
         }}
-        style={{ width: "100%", height: "100vh" }}
+        style={{ width: "100%", height: "100%" }}
         mapStyle={`https://api.maptiler.com/maps/streets/style.json?key=${process.env.REACT_APP_MAPTILER_KEY}`}
       >
         {clicked && !end &&
@@ -100,6 +102,7 @@ export default function NewGuessMap({ handleGuess, guesses, end, key }) {
           guesses.map(
             guess => (
               <CustomMarker
+                key={`${guess.latitude}-${guess.longitude}`}
                 latitude={guess.latitude} longitude={guess.longitude}
                 text={formatDistance(guess.distance)}
               />

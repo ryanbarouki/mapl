@@ -168,7 +168,6 @@ function Play() {
           end={end}
         />
         <NewGuessMap
-          key={`${width}-${height}`}
           handleGuess={handleGuess}
           guesses={guesses}
           end={end}

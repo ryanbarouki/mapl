@@ -7,7 +7,7 @@ import { HiMapPin } from "react-icons/hi2";
 import { Button } from '../globalStyles';
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, Marker, Tooltip } from 'react-leaflet'
-import { TileLayer } from 'react-leaflet';
+import { MapLibreTileLayer } from './TileLayer.js';
 import { useMapEvents } from 'react-leaflet/hooks'
 import L from 'leaflet'
 import { useRef } from 'react';
@@ -127,9 +127,9 @@ function GuessMap({ handleGuess, guesses, end, key }) {
         onClick={handleClick}
         scrollWheelZoom={true}>
         <MapEvents handleClick={handleClick} />
-        <TileLayer
+        <MapLibreTileLayer
           attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-          url="https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png"
+          url="https://tiles.stadiamaps.com/styles/outdoors.json"
         />
         {clicked && !end &&
           <StyledMarker

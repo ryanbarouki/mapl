@@ -11,9 +11,11 @@ import NewGuessMap from './NewGuessMap.js';
 
 const Container = styled.div`
   width: 100%;
-  height: 100%;
+  height: calc(100% - 70px - 2rem);
+  bottom: 0;
   display: flex;
   flex-direction: column;
+  position: fixed;
 `;
 
 const Screen = styled.div`

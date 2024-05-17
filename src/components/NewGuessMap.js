@@ -31,14 +31,14 @@ const Dist = styled.div`
 
 const MapWrap = styled.div`
   position: absolute;
-  // bottom: -40vh;
-  // right: -40vw;
-  bottom: 0;
-  right: 0;
+  bottom: -40vh;
+  right: -40vw;
+  // bottom: 0;
+  // right: 0;
   display: flex;
   flex-direction: column;
-  height: 30vh;
-  width: 30vw;
+  height: 70vh;
+  width: 70vw;
   transition: all 0.5s ease-in-out;
   opacity: 0.5;
   border: solid;
@@ -46,18 +46,14 @@ const MapWrap = styled.div`
   border-color: var(--primary-button-unpressed);
   z-index: 10000;
 &:hover {
+    opacity: 1;
     bottom: 0;
     right: 0;
-    opacity: 1;
-    height: 70vh;
-    width: 70vw;
   }
 &:active {
     bottom: 0;
     right: 0;
     opacity: 1;
-    height: 70vh;
-    width: 70vw;
   }
 `;
 

@@ -48,7 +48,7 @@ const Home = () => {
       />
       <Options>
         <Link to="/play" style={{ textDecoration: "none" }}>
-          <Text>Play</Text>
+          <Text>Play,</Text>
         </Link>
         <Text onClick={() => setOpenHowTo(true)}>How?</Text>
       </Options>

@@ -24,7 +24,9 @@ const ModalContent = styled.div`
   flex-direction: column;
   justify-content: left;
   width: clamp(200px, 70svw, 500px);
-  height: clamp(200px, auto, 90svh);
+  max-width: 80svw;
+  height: auto;
+  max-height: 90svh;
   gap: 1rem;
   font-family: BRShape;
   overflow-y: auto;

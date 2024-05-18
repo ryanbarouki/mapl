@@ -24,12 +24,13 @@ const ModalContent = styled.div`
   flex-direction: column;
   justify-content: left;
   width: clamp(200px, 70svw, 500px);
-  height: clamp(200px, 40svh, 500px);
+  height: clamp(200px, auto, 90svh);
   gap: 1rem;
   font-family: BRShape;
-  overflow: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
 `;
 
 const Modal = ({ isOpen, onClose, children }) => {

@@ -23,8 +23,16 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
-  width: clamp(200px, 70vw, 500px);
+  width: clamp(200px, 70svw, 500px);
+  max-width: 80svw;
+  height: auto;
+  max-height: 90svh;
   gap: 1rem;
+  font-family: BRShape;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
 `;
 
 const Modal = ({ isOpen, onClose, children }) => {

@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { createGlobalStyle } from 'styled-components';
 import { lightTheme } from './theme';
 import { BrowserRouter } from 'react-router-dom';

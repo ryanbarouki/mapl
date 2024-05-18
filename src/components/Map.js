@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import 'leaflet/dist/leaflet.css';
-import ReactMapGL, { Marker } from 'react-map-gl';
+import "@maptiler/sdk/dist/maptiler-sdk.css";
+import Map, { Marker } from 'react-map-gl';
 import { HiMapPin } from "react-icons/hi2";
 import styled from 'styled-components';
-import { formatDistance } from './GuessMap';
+import { formatDistance } from './NewGuessMap';
+import CustomMarker from './CustomMarker';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 const StyledMarker = styled(Marker)`
   display: flex;
@@ -17,15 +20,12 @@ const Dist = styled.div`
   font-size: 20px;
 `;
 
-function Map({ zoom, latitude, longitude, guesses, end }) {
+function ViewMap({ zoom, latitude, longitude, guesses, end }) {
 
   return (
 
-    // <img
-    //   src={`https://api.mapbox.com/styles/v1/ryanbarouki/clupsf5gr00vl01r2cqvg81tb/static/pin-l-embassy+f74e4e(${longitude},${latitude})/${longitude},${latitude},${zoom}/${1280}x${1280}@2x?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`}
-    // />
-
-    <ReactMapGL
+    <Map
+      mapLib={maplibregl}
       scrollZoom={false}
       dragPan={false}
       dragRotate={false}
@@ -33,9 +33,8 @@ function Map({ zoom, latitude, longitude, guesses, end }) {
       latitude={latitude}
       longitude={longitude}
       zoom={zoom}
-      mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
       style={{ width: '100%', height: '100%' }}
-      mapStyle="mapbox://styles/ryanbarouki/clupsf5gr00vl01r2cqvg81tb"
+      mapStyle={`https://api.maptiler.com/maps/e88d9cf7-c88c-40cb-9510-bb1f7a29c306/style.json?key=${process.env.REACT_APP_MAPTILER_KEY}`}
     >
       {
         latitude && longitude &&
@@ -46,15 +45,16 @@ function Map({ zoom, latitude, longitude, guesses, end }) {
       {end &&
         guesses.map(
           guess => (
-            <StyledMarker latitude={guess.latitude} longitude={guess.longitude}>
-              <HiMapPin size={30} />
-              <Dist>{formatDistance(guess.distance)}</Dist>
-            </StyledMarker>
+            <CustomMarker
+              key={`${guess.latitude}-${guess.longitude}`}
+              latitude={guess.latitude} longitude={guess.longitude}
+              text={formatDistance(guess.distance)}
+            />
           )
         )
       }
-    </ReactMapGL>
+    </Map>
   );
 }
 
-export default Map;
+export default ViewMap;

@@ -13,6 +13,8 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+  bottom: 0;
 `;
 
 const Logo = styled.img`
@@ -41,6 +43,7 @@ const IconContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 1rem;
+  align-items: center;
 `;
 
 const Bar = styled.div`
@@ -49,6 +52,8 @@ const Bar = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
+  height: 70px;
+  gap: 1rem;
 `;
 
 const NavItem = styled.div`

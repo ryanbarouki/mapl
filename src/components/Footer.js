@@ -11,6 +11,7 @@ const FooterContainer = styled.footer`
   bottom: 0;
   background-color: white;
   text-align: center;
+  align-items: center;
   justify-content: space-between;
   font-family: BRShape;
   width: 100%;

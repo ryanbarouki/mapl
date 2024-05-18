@@ -97,7 +97,7 @@ function Play() {
           // Extract latitude and longitude from the response
           const random_index = Math.floor(Math.random() * places.length);
           const [city, _, lat, lon, country] = places[random_index]
-          setZoom(11);
+          setZoom(10);
           setAnswer({ latitude: lat, longitude: lon });
           setStart(true);
           setName(`${city}, ${country}`)

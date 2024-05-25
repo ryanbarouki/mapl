@@ -14,7 +14,7 @@
     "dotenv": "^16.4.5",
     "geolib": "^3.3.4",
     "leaflet": "^1.9.4",
-    "mapkit-react": "^1.15.0",
+    "mapkit-react": "^1.15.1",
     "maplibre-gl": "^4.3.1",
     "papaparse": "^5.4.1",
     "react": "^18.2.0",

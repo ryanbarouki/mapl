@@ -47,7 +47,8 @@ function ViewMap({ zoom, latitude, longitude, guesses, end }) {
           guess => (
             <CustomMarker
               key={`${guess.latitude}-${guess.longitude}`}
-              latitude={guess.latitude} longitude={guess.longitude}
+              latitude={guess.latitude}
+              longitude={guess.longitude}
               text={formatDistance(guess.distance)}
             />
           )

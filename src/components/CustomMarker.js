@@ -10,8 +10,13 @@ const MarkerContainer = styled.div`
 `;
 
 const MarkerText = styled.div`
-  font-size: 1.5rem;
-  color: #000;
+  text-align: center;
+  font-size: 20px;
+  background-color: white;
+  opacity: 0.8;
+  border-radius: 3px;
+  padding: 5px;
+  font-family: BRShape;
 `;
 
 const Icon = styled(HiMapPin)`

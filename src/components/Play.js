@@ -8,6 +8,8 @@ import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
 import HowToPlay from './HowToPlay.js';
 import NewGuessMap from './NewGuessMap.js';
+import GuessMap from './GuessMap';
+import AppleMap from './AppleMaps.js';
 
 const Container = styled.div`
   width: 100%;
@@ -23,11 +25,11 @@ const Screen = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  ${props => !props.end ? "justify-content: center;" : ""}
+  ${props => !props.$end ? "justify-content: center;" : ""}
   align-items: center;
-  background-color: ${props => props.visible ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)"};
+  background-color: ${props => props.$visible ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)"};
   position: fixed;
-  z-index: ${props => props.visible ? "1000" : "-1"};
+  z-index: ${props => props.$visible ? "1000" : "-1"};
   transition: all 0.3s ease-in;
   overflow: hidden;
 `;
@@ -112,6 +114,7 @@ function Play() {
 
   const handleGuess = (newGuess, setClicked) => {
     if (end) return;
+    console.log(newGuess)
     const distance = getDistance(newGuess, answer);
     const num_guesses = guesses.length;
     setGuesses(guesses => [...guesses, {
@@ -134,14 +137,14 @@ function Play() {
     <>
       <Container>
         {!start &&
-          <Screen visible={!start} end={false}>
+          <Screen $visible={!start} $end={false}>
             <EndDiv>
               Loading Coordinates...
             </EndDiv>
           </Screen>
         }
         {end &&
-          <Screen visible={end} end={true}>
+          <Screen $visible={end} $end={true}>
             <EndDiv>Score:</EndDiv>
             <EndDiv>{score}/10000</EndDiv>
             <Name>{name}</Name>
@@ -169,7 +172,7 @@ function Play() {
           longitude={answer.longitude}
           end={end}
         />
-        <NewGuessMap
+        <AppleMap
           handleGuess={handleGuess}
           guesses={guesses}
           end={end}

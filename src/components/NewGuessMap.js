@@ -9,25 +9,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { HiMapPin } from "react-icons/hi2";
 import CustomMarker from './CustomMarker';
 
-// const MapWrap = styled.div`
-//   position: relative;
-//   width: 100%;
-//   height: 100vh;
-// `;
-
 export function formatDistance(distance) {
   return `${(distance / 1000).toFixed(1)}km`
 }
-
-const MapContainer = styled.div`
-  width: 100%;
-  height: 100%;
-`;
-
-const Dist = styled.div`
-  text-align: center;
-  font-size: 20px;
-`;
 
 const MapWrap = styled.div`
   position: absolute;

@@ -23,13 +23,13 @@ const MapWrap = styled.div`
   border-width: 2px;
   border-color: var(--primary-button-unpressed);
   z-index: 10000;
-  transition-delay: 1s;
+  // transition-delay: 1s;
 
   &:hover {
     opacity: 1;
     height: 70vh;
     width: 70vw;
-    transition-delay: 0s;
+    // transition-delay: 0s;
   }
 
   &:active {

@@ -2,15 +2,13 @@
 Play at [mapl.life](https://mapl.life)
 
 ## Dev TODOs
+- Different map types
+- A mode where it only zooms out a bit but adds more details on the map bit by bit
 - nav bar collapse when small
-- make sure new map will work on live website
-
-- Scale marker on map
 - Ads when API requests start to charge $$
 - Multiple rounds
 - Do a daily guess + regular
 - Share feature
-- Feedback contact details
 - Add a breakdown at the end
 - Flags at the end
 - Consider removing road signs or add them on the second go?

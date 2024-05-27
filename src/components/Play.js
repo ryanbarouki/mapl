@@ -99,8 +99,9 @@ function Play() {
           // Extract latitude and longitude from the response
           const random_index = Math.floor(Math.random() * places.length);
           const [city, _, lat, lon, country] = places[random_index]
-          setZoom(10);
+          setZoom(13);
           setAnswer({ latitude: lat, longitude: lon });
+          // setAnswer({ latitude: 51.5972, longitude: 0.1276 }); // Dev
           setStart(true);
           setName(`${city}, ${country}`)
         }
@@ -123,12 +124,12 @@ function Play() {
     }]);
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
-      setZoom(3);
+      setZoom(2);
       setScore(Math.round(calculateScore(distance, num_guesses + 1)));
       console.log(calculateScore(distance, num_guesses + 1))
     }
     else {
-      setZoom(zoom => zoom - 2);
+      setZoom(zoom => zoom - 3);
     }
     setClicked(false);
   };

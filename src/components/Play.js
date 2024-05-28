@@ -166,13 +166,15 @@ function Play() {
         {/*   longitude={answer.longitude} */}
         {/*   end={end} */}
         {/* /> */}
-        <ViewMap
-          zoom={zoom}
-          guesses={guesses}
-          latitude={answer.latitude}
-          longitude={answer.longitude}
-          end={end}
-        />
+        {start &&
+          <ViewMap
+            zoom={zoom}
+            guesses={guesses}
+            latitude={answer.latitude}
+            longitude={answer.longitude}
+            end={end}
+          />
+        }
         <AppleMap
           handleGuess={handleGuess}
           guesses={guesses}

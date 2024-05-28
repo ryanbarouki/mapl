@@ -29,6 +29,8 @@ function ViewMap({ zoom, latitude, longitude, guesses, end }) {
       scrollZoom={false}
       dragPan={false}
       dragRotate={false}
+      touchPitch={false}
+      doubleClickZoom={false}
       touchZoomRotate={false}
       latitude={latitude}
       longitude={longitude}

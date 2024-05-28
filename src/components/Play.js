@@ -7,8 +7,6 @@ import Papa from 'papaparse';
 import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
 import HowToPlay from './HowToPlay.js';
-import NewGuessMap from './NewGuessMap.js';
-import GuessMap from './GuessMap';
 import AppleMap from './AppleMaps.js';
 
 const Container = styled.div`
@@ -158,14 +156,6 @@ function Play() {
         <HowToPlay isOpen={openHowTo}
           onClose={() => setOpenHowTo(false)}
         />
-        {/* <NewMap */}
-        {/*   key={zoom} */}
-        {/*   zoom={zoom} */}
-        {/*   guesses={guesses} */}
-        {/*   latitude={answer.latitude} */}
-        {/*   longitude={answer.longitude} */}
-        {/*   end={end} */}
-        {/* /> */}
         {start &&
           <ViewMap
             zoom={zoom}
@@ -180,12 +170,6 @@ function Play() {
           guesses={guesses}
           end={end}
         />
-        {/* <GuessMap */}
-        {/*   key={`${width}-${height}`} */}
-        {/*   handleGuess={handleGuess} */}
-        {/*   guesses={guesses} */}
-        {/*   end={end} */}
-        {/* /> */}
       </Container>
     </>
   );

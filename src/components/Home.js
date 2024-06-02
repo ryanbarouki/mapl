@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import HowToPlay from './HowToPlay';
 import { useState } from 'react';
 import Footer from './Footer';
+import maplLogo from '../mapl_logo.svg';
 
 const Container = styled.div`
   display: flex;
@@ -12,6 +13,13 @@ const Container = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
+  gap: 1rem;
+`;
+
+const Logo = styled.img`
+  height: 8rem;
+  pointer-events: none;
+  width: clamp(100px, 80vw, 500px);
 `;
 
 const Options = styled.div`
@@ -20,17 +28,17 @@ const Options = styled.div`
   justify-content: center;
   align-items: center;
   gap: 3rem;
-  height: 100%;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 650px) {
     flex-direction: column;
+    gap: 1rem;
   }
 `;
 
 const Text = styled.div`
   font-family: BRShape;
-  font-weight: 900;
-  font-size: 5rem;
+  font-size: 2.86rem;
+  // font-size: clamp(1rem, 10vw, 3rem);
   color: var(--primary-highlight);
   cursor: pointer;
   &:hover{
@@ -46,11 +54,15 @@ const Home = () => {
       <HowToPlay isOpen={openHowTo}
         onClose={() => setOpenHowTo(false)}
       />
+      <Logo src={maplLogo} />
       <Options>
-        <Link to="/play" style={{ textDecoration: "none" }}>
-          <Text>Play,</Text>
+        <Link to="/daily" style={{ textDecoration: "none" }}>
+          <Text>Daily</Text>
         </Link>
-        <Text onClick={() => setOpenHowTo(true)}>How?</Text>
+        <Link to="/play" style={{ textDecoration: "none" }}>
+          <Text>Normal</Text>
+        </Link>
+        <Text onClick={() => setOpenHowTo(true)}>What?</Text>
       </Options>
       <Footer />
     </Container>

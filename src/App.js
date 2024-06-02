@@ -7,6 +7,8 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import HowToPlay from './components/HowToPlay';
 import { useState } from 'react';
+import { HomeRoute } from './components/HomeRoute';
+import { Outlet, useLocation } from 'react-router-dom';
 
 const Container = styled.div`
   width: 100%;
@@ -68,31 +70,37 @@ const NavItem = styled.div`
 
 function App() {
   const [openHowTo, setOpenHowTo] = useState(false);
+  const location = useLocation();
 
   return (
     <Container>
-      <HowToPlay isOpen={openHowTo}
-        onClose={() => setOpenHowTo(false)}
-      />
-      <Bar>
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <Logo src={maplLogo} />
-        </Link>
-        <IconContainer>
-          <Link to="/play" style={{ textDecoration: "none" }}>
-            <NavItem>
-              Play
-            </NavItem>
-          </Link>
-          <Link to="/about" style={{ textDecoration: "none" }}>
-            <NavItem>
-              About
-            </NavItem>
-          </Link>
-          <NavItem onClick={() => setOpenHowTo(true)}>How to Play</NavItem>
-        </IconContainer>
-      </Bar>
-      <Main></Main>
+      <HomeRoute />
+      {location.pathname !== "/" &&
+        <>
+          <HowToPlay isOpen={openHowTo}
+            onClose={() => setOpenHowTo(false)}
+          />
+          <Bar>
+            <Link to="/" style={{ textDecoration: "none" }}>
+              <Logo src={maplLogo} />
+            </Link>
+            <IconContainer>
+              <Link to="/play" style={{ textDecoration: "none" }}>
+                <NavItem>
+                  Play
+                </NavItem>
+              </Link>
+              <Link to="/about" style={{ textDecoration: "none" }}>
+                <NavItem>
+                  About
+                </NavItem>
+              </Link>
+              <NavItem onClick={() => setOpenHowTo(true)}>How to Play</NavItem>
+            </IconContainer>
+          </Bar>
+          <Main></Main>
+        </>
+      }
     </Container>
   );
 }

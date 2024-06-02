@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import ViewMap from './Map.js';
 //import GuessMap from './GuessMap.js';
 import styled from 'styled-components';
 import { getDistance } from 'geolib';
+import { DateTime } from "luxon";
 import Papa from 'papaparse';
 import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
 import HowToPlay from './HowToPlay.js';
 import AppleMap from './AppleMaps.js';
+import seedrandom from 'seedrandom';
 
 const Container = styled.div`
   width: 100%;
@@ -74,7 +76,12 @@ const MAX_DIST = 2000e3;
 const calculateScore = (distance, num_guesses) =>
   (MAX_SCORE - 1000 * (num_guesses - 1)) * Math.exp(-((distance / MAX_DIST)))
 
-function Play() {
+const getDayString = () => {
+  return DateTime.now().toFormat("yyyy-MM-dd");
+}
+
+function Play({ daily }) {
+  const dayString = useMemo(getDayString, []);
   const [guesses, setGuesses] = useState([]);
   const [answer, setAnswer] = useState({
     latitude: 0,
@@ -95,7 +102,7 @@ function Play() {
         const places = Papa.parse(csv).data
         if (places) {
           // Extract latitude and longitude from the response
-          const random_index = Math.floor(Math.random() * places.length);
+          const random_index = Math.floor(seedrandom.alea(daily ? dayString : Math.random())() * places.length);
           const [city, _, lat, lon, country] = places[random_index]
           setZoom(13);
           setAnswer({ latitude: lat, longitude: lon });

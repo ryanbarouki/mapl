@@ -15,6 +15,8 @@ const FooterContainer = styled.footer`
   justify-content: space-between;
   font-family: BRShape;
   width: 100%;
+  position: absolute;
+  bottom: 0;
 `;
 
 const FooterLink = styled(Link)`

@@ -1,15 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import ViewMap from './Map.js';
-//import GuessMap from './GuessMap.js';
 import styled from 'styled-components';
 import { getDistance } from 'geolib';
 import { DateTime } from "luxon";
 import Papa from 'papaparse';
-import { useWindowSize } from '../Hooks/useWindowSize';
 import { Button } from '../globalStyles';
 import HowToPlay from './HowToPlay.js';
 import AppleMap from './AppleMaps.js';
 import seedrandom from 'seedrandom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Container = styled.div`
   width: 100%;
@@ -80,9 +79,7 @@ const getDayString = () => {
   return DateTime.now().toFormat("yyyy-MM-dd");
 }
 
-function Play({ daily }) {
-  const dayString = useMemo(getDayString, []);
-  const [guesses, setGuesses] = useState([]);
+function Play({ guesses, addGuess, random_seed }) {
   const [answer, setAnswer] = useState({
     latitude: 0,
     longitude: 0
@@ -92,8 +89,17 @@ function Play({ daily }) {
   const [end, setEnd] = useState(false);
   const [score, setScore] = useState(0);
   const [name, setName] = useState("");
-  const [width, height] = useWindowSize();
   const [openHowTo, setOpenHowTo] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (guesses && guesses.length === MAX_GUESSES) {
+      setEnd(true);
+      setZoom(2);
+      const distance = guesses[guesses.length - 1].distance;
+      setScore(Math.round(calculateScore(distance, guesses.length)));
+    }
+  }, []);
 
   useEffect(() => {
     fetch(`worldcities.csv`)
@@ -102,7 +108,7 @@ function Play({ daily }) {
         const places = Papa.parse(csv).data
         if (places) {
           // Extract latitude and longitude from the response
-          const random_index = Math.floor(seedrandom.alea(daily ? dayString : Math.random())() * places.length);
+          const random_index = Math.floor(seedrandom.alea(random_seed)() * places.length);
           const [city, _, lat, lon, country] = places[random_index]
           setZoom(13);
           setAnswer({ latitude: lat, longitude: lon });
@@ -123,15 +129,15 @@ function Play({ daily }) {
     console.log(newGuess)
     const distance = getDistance(newGuess, answer);
     const num_guesses = guesses.length;
-    setGuesses(guesses => [...guesses, {
+    console.log(guesses)
+    addGuess({
       ...newGuess,
       distance: distance
-    }]);
+    });
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
       setZoom(2);
       setScore(Math.round(calculateScore(distance, num_guesses + 1)));
-      console.log(calculateScore(distance, num_guesses + 1))
     }
     else {
       setZoom(zoom => zoom - 3);
@@ -154,7 +160,13 @@ function Play({ daily }) {
             <EndDiv>Score:</EndDiv>
             <EndDiv>{score}/10000</EndDiv>
             <Name>{name}</Name>
-            <Button onClick={() => window.location.reload()}>Play again</Button>
+            <Link reloadDocument to='/play'>
+              <Button>Play more</Button>
+            </Link>
+
+            {location.pathname === '/daily' &&
+              <Name>Come back tomorrow to play the daily puzzle!</Name>
+            }
           </Screen>
         }
         <TopBar>

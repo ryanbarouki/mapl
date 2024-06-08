@@ -99,6 +99,9 @@ function Play({ guesses, addGuess, random_seed }) {
       const distance = guesses[guesses.length - 1].distance;
       setScore(Math.round(calculateScore(distance, guesses.length)));
     }
+    else if (guesses) {
+      console.log("hello")
+    }
   }, []);
 
   useEffect(() => {
@@ -110,7 +113,7 @@ function Play({ guesses, addGuess, random_seed }) {
           // Extract latitude and longitude from the response
           const random_index = Math.floor(seedrandom.alea(random_seed)() * places.length);
           const [city, _, lat, lon, country] = places[random_index]
-          setZoom(13);
+          setZoom(end ? 2 : 13 - 3 * guesses.length);
           setAnswer({ latitude: lat, longitude: lon });
           // setAnswer({ latitude: 51.5972, longitude: 0.1276 }); // Dev
           setStart(true);

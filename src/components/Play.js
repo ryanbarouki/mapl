@@ -45,6 +45,12 @@ const EndDiv = styled.div`
 }
 `;
 
+const Buttons = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+`;
+
 const Name = styled.h2`
   color: white;
   text-align: center;
@@ -96,6 +102,7 @@ function Play({ guesses, addGuess, random_seed }) {
   const [name, setName] = useState("");
   const [openHowTo, setOpenHowTo] = useState(false);
   const location = useLocation();
+  const [breakdown, setBreakdown] = useState(false);
 
   useEffect(() => {
     if (guesses && guesses.length === MAX_GUESSES) {
@@ -163,14 +170,17 @@ function Play({ guesses, addGuess, random_seed }) {
             </EndDiv>
           </Screen>
         }
-        {end &&
+        {end && !breakdown &&
           <Screen $visible={end} $end={true}>
             <EndDiv>You scored</EndDiv>
             <EndDiv><span>{score}</span>/10000</EndDiv>
             <Name>{name}</Name>
-            <Link reloadDocument to='/play'>
-              <Button>Play more</Button>
-            </Link>
+            <Buttons>
+              <Link reloadDocument to='/play'>
+                <Button>Play more</Button>
+              </Link>
+              <Button onClick={() => setBreakdown(true)}>Breakdown</Button>
+            </Buttons>
 
             {location.pathname === '/daily' &&
               <Name>Come back tomorrow to play the daily puzzle!</Name>
@@ -193,6 +203,7 @@ function Play({ guesses, addGuess, random_seed }) {
               latitude={answer.latitude}
               longitude={answer.longitude}
               end={end}
+              breakdown={breakdown}
             />
             {!end &&
               <AppleMap

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import Map, { Marker } from 'react-map-gl';
 import { HiMapPin } from "react-icons/hi2";
@@ -20,21 +20,34 @@ const Dist = styled.div`
   font-size: 20px;
 `;
 
-function ViewMap({ zoom, latitude, longitude, guesses, end }) {
+function ViewMap({ zoom, latitude, longitude, guesses, end, breakdown }) {
+
+  const [viewState, setViewState] = useState({
+    longitude:
+      longitude, latitude: latitude, zoom: zoom
+  })
+
+  useEffect(() => setViewState(oldView => ({ ...oldView, zoom: zoom })),
+    [zoom]);
+  console.log(viewState)
+  const onMove = (evt) => {
+    if (breakdown) {
+      setViewState(evt.viewState)
+    }
+  }
 
   return (
 
     <Map
+      {...viewState}
       mapLib={maplibregl}
-      scrollZoom={false}
-      dragPan={false}
-      dragRotate={false}
-      touchPitch={false}
-      doubleClickZoom={false}
-      touchZoomRotate={false}
-      latitude={latitude}
-      longitude={longitude}
-      zoom={zoom}
+      scrollZoom={breakdown}
+      dragPan={breakdown}
+      dragRotate={breakdown}
+      touchPitch={breakdown}
+      doubleClickZoom={breakdown}
+      touchZoomRotate={breakdown}
+      onMove={onMove}
       style={{ width: '100%', height: '100%' }}
       mapStyle={`https://api.maptiler.com/maps/e88d9cf7-c88c-40cb-9510-bb1f7a29c306/style.json?key=${process.env.REACT_APP_MAPTILER_KEY}`}
     >

@@ -2,7 +2,6 @@
 Play at [mapl.life](https://mapl.life)
 
 ## Dev TODOs
-- Do a daily guess + regular
 - Multiple rounds
 - Share feature
 - Add a breakdown at the end

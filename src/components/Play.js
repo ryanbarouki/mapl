@@ -21,11 +21,12 @@ const Container = styled.div`
 
 const Screen = styled.div`
   width: 100%;
-  height: 100%;
+  height: inherit;
   display: flex;
   flex-direction: column;
   ${props => !props.$end ? "justify-content: center;" : ""}
   align-items: center;
+  justify-content: center;
   background-color: ${props => props.$visible ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)"};
   position: fixed;
   z-index: ${props => props.$visible ? "1000" : "-1"};
@@ -38,6 +39,10 @@ const EndDiv = styled.div`
   font-family: inherit;
   font-size: 3rem;
   text-align: center;
+
+  span {
+    font-weight: bold;
+}
 `;
 
 const Name = styled.h2`
@@ -160,8 +165,8 @@ function Play({ guesses, addGuess, random_seed }) {
         }
         {end &&
           <Screen $visible={end} $end={true}>
-            <EndDiv>Score:</EndDiv>
-            <EndDiv>{score}/10000</EndDiv>
+            <EndDiv>You scored</EndDiv>
+            <EndDiv><span>{score}</span>/10000</EndDiv>
             <Name>{name}</Name>
             <Link reloadDocument to='/play'>
               <Button>Play more</Button>
@@ -173,25 +178,31 @@ function Play({ guesses, addGuess, random_seed }) {
           </Screen>
         }
         <TopBar>
-          <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
+          {!end &&
+            <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
+          }
         </TopBar>
         <HowToPlay isOpen={openHowTo}
           onClose={() => setOpenHowTo(false)}
         />
         {start &&
-          <ViewMap
-            zoom={zoom}
-            guesses={guesses}
-            latitude={answer.latitude}
-            longitude={answer.longitude}
-            end={end}
-          />
+          <>
+            <ViewMap
+              zoom={zoom}
+              guesses={guesses}
+              latitude={answer.latitude}
+              longitude={answer.longitude}
+              end={end}
+            />
+            {!end &&
+              <AppleMap
+                handleGuess={handleGuess}
+                guesses={guesses}
+                end={end}
+              />
+            }
+          </>
         }
-        <AppleMap
-          handleGuess={handleGuess}
-          guesses={guesses}
-          end={end}
-        />
       </Container>
     </>
   );

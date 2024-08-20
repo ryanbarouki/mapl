@@ -2,8 +2,7 @@
 Play at [mapl.life](https://mapl.life)
 
 ## Dev TODOs
-- add compass and scale to map
-- maybe reveal small town names at one stage
+- maybe reveal small town names at one stage via hint 
 - Multiple rounds
 - Share feature for daily game
 - ability to go back to previous zoom levels of guesses?

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
-import Map, { Marker } from 'react-map-gl';
+import Map, { Marker, ScaleControl } from 'react-map-gl';
 import { MdLocationPin } from "react-icons/md";
 import styled from 'styled-components';
 import { formatDistance } from './NewGuessMap';
@@ -36,6 +36,7 @@ function ViewMap({ zoom, latitude, longitude, guesses, end, breakdown }) {
       doubleClickZoom={breakdown}
       touchZoomRotate={breakdown}
       onMove={onMove}
+      showsScale={true}
       style={{ width: '100%', height: '100%' }}
       mapStyle={`https://api.maptiler.com/maps/e88d9cf7-c88c-40cb-9510-bb1f7a29c306/style.json?key=${process.env.REACT_APP_MAPTILER_KEY}`}
     >
@@ -57,6 +58,7 @@ function ViewMap({ zoom, latitude, longitude, guesses, end, breakdown }) {
           )
         )
       }
+      <ScaleControl />
     </Map>
   );
 }

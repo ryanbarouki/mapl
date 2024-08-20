@@ -1,24 +1,12 @@
 import { useEffect, useState } from 'react';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import Map, { Marker } from 'react-map-gl';
-import { HiMapPin } from "react-icons/hi2";
+import { MdLocationPin } from "react-icons/md";
 import styled from 'styled-components';
 import { formatDistance } from './NewGuessMap';
 import CustomMarker from './CustomMarker';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
-const StyledMarker = styled(Marker)`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Dist = styled.div`
-  text-align: center;
-  font-size: 20px;
-`;
 
 function ViewMap({ zoom, latitude, longitude, guesses, end, breakdown }) {
 
@@ -54,7 +42,7 @@ function ViewMap({ zoom, latitude, longitude, guesses, end, breakdown }) {
       {
         latitude && longitude &&
         <Marker longitude={longitude} latitude={latitude}>
-          <HiMapPin size={40} color='red' />
+          <MdLocationPin size={40} color='#ff173a' />
         </Marker>
       }
       {end &&

@@ -6,9 +6,11 @@ import { DateTime } from "luxon";
 import Papa from 'papaparse';
 import { Button } from '../globalStyles';
 import HowToPlay from './HowToPlay.js';
-import AppleMap from './AppleMaps.js';
+import AppleMap from './GuessMapApple.js';
 import seedrandom from 'seedrandom';
 import { Link, useLocation } from 'react-router-dom';
+import BareAppleMap from './AppleMap.js';
+import { Maximize } from '@mui/icons-material';
 
 const Container = styled.div`
   width: 100%;
@@ -66,6 +68,10 @@ const Div = styled.div`
   font-size: 1.5rem;
   background-color: var(--primary-button-unpressed);
   flex-shrink: 1;
+
+  span {
+    font-weight: bold;
+}
 
 `;
 
@@ -126,7 +132,7 @@ function Play({ guesses, addGuess, random_seed }) {
           const random_index = Math.floor(seedrandom.alea(random_seed)() * places.length);
           const [city, _, lat, lon, country] = places[random_index]
           setZoom(end ? 2 : 13 - 3 * guesses.length);
-          setAnswer({ latitude: lat, longitude: lon });
+          setAnswer({ latitude: Number(lat), longitude: Number(lon) });
           // setAnswer({ latitude: 51.5972, longitude: 0.1276 }); // Dev
           setStart(true);
           setName(`${city}, ${country}`)
@@ -189,13 +195,13 @@ function Play({ guesses, addGuess, random_seed }) {
         }
         <TopBar>
           {!end &&
-            <Div>Guesses remaining: {MAX_GUESSES - guesses.length}</Div>
+            <Div><span>{MAX_GUESSES - guesses.length}</span> {MAX_GUESSES - guesses.length > 1 ? "guesses" : "guess"} remaining</Div>
           }
         </TopBar>
         <HowToPlay isOpen={openHowTo}
           onClose={() => setOpenHowTo(false)}
         />
-        {start &&
+        {start && !end &&
           <>
             <ViewMap
               zoom={zoom}
@@ -211,6 +217,22 @@ function Play({ guesses, addGuess, random_seed }) {
                 guesses={guesses}
                 end={end}
               />
+            }
+          </>
+        }
+        {end &&
+          <>
+            <BareAppleMap
+              guesses={guesses}
+              answer={answer}
+              name={name}
+            />
+            {breakdown &&
+              <TopBar>
+                <Link reloadDocument to='/play'>
+                  <Button>Play again</Button>
+                </Link>
+              </TopBar>
             }
           </>
         }

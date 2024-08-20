@@ -2,10 +2,7 @@ import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Button } from '../globalStyles';
 import { Annotation, Map, Marker } from 'mapkit-react';
-
-export function formatDistance(distance) {
-  return `${(distance / 1000).toFixed(1)}km`;
-}
+import { formatDistance } from './AppleMap';
 
 const MapWrap = styled.div`
   position: absolute;
@@ -79,7 +76,7 @@ export default function AppleMap({ handleGuess, guesses, end }) {
           <Marker
             latitude={marker.latitude}
             longitude={marker.longitude}
-            color="#FF0000"
+            color="#ff173a"
           />
         )}
         {guesses.map((guess, index) => (
@@ -88,7 +85,7 @@ export default function AppleMap({ handleGuess, guesses, end }) {
               key={index}
               latitude={guess.latitude}
               longitude={guess.longitude}
-              color="#0000FF"
+              color="#FFCB00"
             // title={`${formatDistance(guess.distance)}`}
             />
             <Annotation latitude={guess.latitude} longitude={guess.longitude}>

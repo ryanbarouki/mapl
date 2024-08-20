@@ -209,7 +209,6 @@ function Play({ guesses, addGuess, random_seed }) {
               latitude={answer.latitude}
               longitude={answer.longitude}
               end={end}
-              breakdown={breakdown}
             />
             {!end &&
               <AppleMap

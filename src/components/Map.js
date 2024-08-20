@@ -8,7 +8,7 @@ import CustomMarker from './CustomMarker';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-function ViewMap({ zoom, latitude, longitude, guesses, end, breakdown }) {
+function ViewMap({ zoom, latitude, longitude, guesses, end }) {
 
   const [viewState, setViewState] = useState({
     longitude:
@@ -17,25 +17,19 @@ function ViewMap({ zoom, latitude, longitude, guesses, end, breakdown }) {
 
   useEffect(() => setViewState(oldView => ({ ...oldView, zoom: zoom })),
     [zoom]);
-  console.log(viewState)
-  const onMove = (evt) => {
-    if (breakdown) {
-      setViewState(evt.viewState)
-    }
-  }
 
   return (
 
     <Map
       {...viewState}
       mapLib={maplibregl}
-      scrollZoom={breakdown}
-      dragPan={breakdown}
-      dragRotate={breakdown}
-      touchPitch={breakdown}
-      doubleClickZoom={breakdown}
-      touchZoomRotate={breakdown}
-      onMove={onMove}
+      scrollZoom={false}
+      dragPan={false}
+      dragRotate={false}
+      touchPitch={false}
+      doubleClickZoom={false}
+      touchZoomRotate={false}
+      onMove={evt => setViewState(evt.viewState)}
       showsScale={true}
       style={{ width: '100%', height: '100%' }}
       mapStyle={`https://api.maptiler.com/maps/e88d9cf7-c88c-40cb-9510-bb1f7a29c306/style.json?key=${process.env.REACT_APP_MAPTILER_KEY}`}

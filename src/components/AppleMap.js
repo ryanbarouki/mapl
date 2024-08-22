@@ -29,6 +29,7 @@ export default function BareAppleMap({ guesses, answer, name }) {
       isZoomEnabled={true}
       isScrollEnabled={true}
       allowWheelToZoom={true}
+      zoom={10}
     >
       {guesses.map((guess, index) => (
         <>

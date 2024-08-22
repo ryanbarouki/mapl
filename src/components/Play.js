@@ -89,6 +89,9 @@ const WIN_RADIUS = 50000; //metres
 const MAX_SCORE = 10000;
 const MAX_DIST = 2000e3;
 
+const MAPS = ["e88d9cf7-c88c-40cb-9510-bb1f7a29c306", "2ba07e07-1a5e-41b5-9c23-0b8d550d726e", "6b3f0bd3-eea3-4016-8e88-77937de021ca"];
+const NUM_HINTS = MAPS.length - 1;
+
 const calculateScore = (distance, num_guesses) =>
   (MAX_SCORE - 1000 * (num_guesses - 1)) * Math.exp(-((distance / MAX_DIST)))
 
@@ -109,6 +112,8 @@ function Play({ guesses, addGuess, random_seed }) {
   const [openHowTo, setOpenHowTo] = useState(false);
   const location = useLocation();
   const [breakdown, setBreakdown] = useState(false);
+  const [map, setMap] = useState(MAPS[0]);
+  const [hints, setHints] = useState(0);
 
   useEffect(() => {
     if (guesses && guesses.length === MAX_GUESSES) {
@@ -145,6 +150,11 @@ function Play({ guesses, addGuess, random_seed }) {
       });
   }, []);
 
+  const handleHint = () => {
+    setMap(MAPS[hints + 1]);
+    setHints(hints => hints + 1);
+  };
+
   const handleGuess = (newGuess, setClicked) => {
     if (end) return;
     console.log(newGuess)
@@ -157,7 +167,7 @@ function Play({ guesses, addGuess, random_seed }) {
     });
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
-      setZoom(2);
+      setZoom(5);
       setScore(Math.round(calculateScore(distance, num_guesses + 1)));
     }
     else {
@@ -195,7 +205,10 @@ function Play({ guesses, addGuess, random_seed }) {
         }
         <TopBar>
           {start && !end &&
-            <Div><span>{MAX_GUESSES - guesses.length}</span> {MAX_GUESSES - guesses.length > 1 ? "guesses" : "guess"} remaining</Div>
+            <>
+              <Div><span>{MAX_GUESSES - guesses.length}</span> {MAX_GUESSES - guesses.length > 1 ? "guesses" : "guess"} remaining</Div>
+              <Button onClick={handleHint} disabled={hints >= NUM_HINTS}>Get Hint</Button>
+            </>
           }
         </TopBar>
         <HowToPlay isOpen={openHowTo}
@@ -209,6 +222,7 @@ function Play({ guesses, addGuess, random_seed }) {
               latitude={answer.latitude}
               longitude={answer.longitude}
               end={end}
+              map={map}
             />
             {!end &&
               <AppleMap

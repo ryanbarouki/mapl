@@ -8,7 +8,7 @@ import CustomMarker from './CustomMarker';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-function ViewMap({ zoom, latitude, longitude, guesses, end }) {
+function ViewMap({ zoom, latitude, longitude, guesses, end, map }) {
 
   const [viewState, setViewState] = useState({
     longitude:
@@ -22,6 +22,7 @@ function ViewMap({ zoom, latitude, longitude, guesses, end }) {
 
     <Map
       {...viewState}
+      key={map}
       mapLib={maplibregl}
       scrollZoom={false}
       dragPan={false}
@@ -32,7 +33,7 @@ function ViewMap({ zoom, latitude, longitude, guesses, end }) {
       onMove={evt => setViewState(evt.viewState)}
       showsScale={true}
       style={{ width: '100%', height: '100%' }}
-      mapStyle={`https://api.maptiler.com/maps/e88d9cf7-c88c-40cb-9510-bb1f7a29c306/style.json?key=${process.env.REACT_APP_MAPTILER_KEY}`}
+      mapStyle={`https://api.maptiler.com/maps/${map}/style.json?key=${process.env.REACT_APP_MAPTILER_KEY}`}
       attributionControl={false}
     >
       {
@@ -53,11 +54,12 @@ function ViewMap({ zoom, latitude, longitude, guesses, end }) {
           )
         )
       }
-      <ScaleControl />
       <AttributionControl
         customAttribution={'<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'}
         compact={true}
+        position="bottom-left"
       />
+      <ScaleControl />
     </Map>
   );
 }

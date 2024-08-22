@@ -194,7 +194,7 @@ function Play({ guesses, addGuess, random_seed }) {
           </Screen>
         }
         <TopBar>
-          {!end &&
+          {start && !end &&
             <Div><span>{MAX_GUESSES - guesses.length}</span> {MAX_GUESSES - guesses.length > 1 ? "guesses" : "guess"} remaining</Div>
           }
         </TopBar>

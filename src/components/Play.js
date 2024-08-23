@@ -10,7 +10,9 @@ import AppleMap from './GuessMapApple.js';
 import seedrandom from 'seedrandom';
 import { Link, useLocation } from 'react-router-dom';
 import BareAppleMap from './AppleMap.js';
-import { Maximize } from '@mui/icons-material';
+import { Share } from './Share.js';
+import { ToastContainer, Flip } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Container = styled.div`
   width: 100%;
@@ -99,6 +101,10 @@ const getDayString = () => {
   return DateTime.now().toFormat("yyyy-MM-dd");
 }
 
+export const getClosestDistance = (guesses) => {
+  return Math.min(...guesses.map(guess => guess.distance));
+}
+
 function Play({ guesses, addGuess, hints, setHints, random_seed }) {
   const [answer, setAnswer] = useState({
     latitude: 0,
@@ -118,7 +124,7 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
     if (guesses && guesses.length === MAX_GUESSES) {
       setEnd(true);
       setZoom(2);
-      const distance = guesses[guesses.length - 1].distance;
+      const distance = getClosestDistance(guesses);
       setScore(Math.round(calculateScore(distance, guesses.length, hints)));
     }
   }, []);
@@ -162,7 +168,8 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
       setZoom(2);
-      setScore(Math.round(calculateScore(distance, num_guesses + 1, hints)));
+      const closestDistance = getClosestDistance(guesses);
+      setScore(Math.round(calculateScore(closestDistance, num_guesses + 1, hints)));
     }
     else {
       setZoom(zoom => zoom - 3);
@@ -172,6 +179,12 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
 
   return (
     <>
+      <ToastContainer
+        hideProgressBar
+        position="top-center"
+        transition={Flip}
+        autoClose={false}
+      />
       <Container>
         {!start &&
           <Screen $visible={!start} $end={false}>
@@ -193,7 +206,16 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
             </Buttons>
 
             {location.pathname === '/daily' &&
-              <Name>Come back tomorrow to play the daily puzzle!</Name>
+              <>
+                <Name>Come back tomorrow to play the daily puzzle!</Name>
+                <Share
+                  score={score}
+                  guesses={guesses}
+                  end={end}
+                  dayString={getDayString()}
+                  hints={hints}
+                />
+              </>
             }
           </Screen>
         }

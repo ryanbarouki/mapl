@@ -3,9 +3,7 @@ Play at [mapl.life](https://mapl.life)
 
 ## Dev TODOs
 - make the breakdown zoom level closer
-- save number of hints used to persistent state and take into account with scoring
 - Multiple rounds
-- Share feature for daily game
 - ability to go back to previous zoom levels of guesses?
 
 - Different map types

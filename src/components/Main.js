@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-import Play from './Play';
 import About from './About';
 import CookiePolicy from './CookiePolicy';
 import PrivacyPolicy from './PrivacyPolicy';

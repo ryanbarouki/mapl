@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Button } from '../globalStyles';
-import { Annotation, Map, Marker } from 'mapkit-react';
+import { Annotation, Map, Marker, CoordinateRegion } from 'mapkit-react';
 
 export function formatDistance(distance) {
   return `${(distance / 1000).toFixed(1)}km`;
@@ -20,7 +20,6 @@ const Dist = styled.div`
 
 export default function BareAppleMap({ guesses, answer, name }) {
   const [mapInstance, setMapInstance] = useState(null);
-  console.log(answer)
   return (
     <Map
       token={process.env.REACT_APP_MAPKIT_JWT}
@@ -29,7 +28,6 @@ export default function BareAppleMap({ guesses, answer, name }) {
       isZoomEnabled={true}
       isScrollEnabled={true}
       allowWheelToZoom={true}
-      zoom={10}
     >
       {guesses.map((guess, index) => (
         <>

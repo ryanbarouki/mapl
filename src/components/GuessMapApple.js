@@ -54,7 +54,6 @@ export default function AppleMap({ handleGuess, guesses, end }) {
 
   const handleClick = (event) => {
     if (end) return;
-    console.log(event)
     const { latitude, longitude } = event.toCoordinates();
 
     setMarker({ longitude: longitude, latitude: latitude });

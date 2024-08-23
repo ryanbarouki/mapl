@@ -99,7 +99,7 @@ const getDayString = () => {
   return DateTime.now().toFormat("yyyy-MM-dd");
 }
 
-function Play({ guesses, addGuess, random_seed }) {
+function Play({ guesses, addGuess, hints, setHints, random_seed }) {
   const [answer, setAnswer] = useState({
     latitude: 0,
     longitude: 0
@@ -112,8 +112,7 @@ function Play({ guesses, addGuess, random_seed }) {
   const [openHowTo, setOpenHowTo] = useState(false);
   const location = useLocation();
   const [breakdown, setBreakdown] = useState(false);
-  const [map, setMap] = useState(MAPS[0]);
-  const [hints, setHints] = useState(0);
+  const [map, setMap] = useState(MAPS[hints]);
 
   useEffect(() => {
     if (guesses && guesses.length === MAX_GUESSES) {
@@ -121,9 +120,6 @@ function Play({ guesses, addGuess, random_seed }) {
       setZoom(2);
       const distance = guesses[guesses.length - 1].distance;
       setScore(Math.round(calculateScore(distance, guesses.length)));
-    }
-    else if (guesses) {
-      console.log("hello")
     }
   }, []);
 
@@ -152,22 +148,20 @@ function Play({ guesses, addGuess, random_seed }) {
 
   const handleHint = () => {
     setMap(MAPS[hints + 1]);
-    setHints(hints => hints + 1);
+    setHints(hints + 1);
   };
 
   const handleGuess = (newGuess, setClicked) => {
     if (end) return;
-    console.log(newGuess)
     const distance = getDistance(newGuess, answer);
     const num_guesses = guesses.length;
-    console.log(guesses)
     addGuess({
       ...newGuess,
-      distance: distance
+      distance: distance,
     });
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
-      setZoom(5);
+      setZoom(2);
       setScore(Math.round(calculateScore(distance, num_guesses + 1)));
     }
     else {

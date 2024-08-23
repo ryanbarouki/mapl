@@ -92,8 +92,8 @@ const MAX_DIST = 2000e3;
 const MAPS = ["e88d9cf7-c88c-40cb-9510-bb1f7a29c306", "2ba07e07-1a5e-41b5-9c23-0b8d550d726e", "6b3f0bd3-eea3-4016-8e88-77937de021ca"];
 const NUM_HINTS = MAPS.length - 1;
 
-const calculateScore = (distance, num_guesses) =>
-  (MAX_SCORE - 1000 * (num_guesses - 1)) * Math.exp(-((distance / MAX_DIST)))
+const calculateScore = (distance, num_guesses, hints) =>
+  (MAX_SCORE - 1000 * (num_guesses - 1) - 200 * hints) * Math.exp(-((distance / MAX_DIST)))
 
 const getDayString = () => {
   return DateTime.now().toFormat("yyyy-MM-dd");
@@ -119,7 +119,7 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
       setEnd(true);
       setZoom(2);
       const distance = guesses[guesses.length - 1].distance;
-      setScore(Math.round(calculateScore(distance, guesses.length)));
+      setScore(Math.round(calculateScore(distance, guesses.length, hints)));
     }
   }, []);
 
@@ -162,7 +162,7 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
     if (distance < WIN_RADIUS || num_guesses + 1 >= MAX_GUESSES) {
       setEnd(true);
       setZoom(2);
-      setScore(Math.round(calculateScore(distance, num_guesses + 1)));
+      setScore(Math.round(calculateScore(distance, num_guesses + 1, hints)));
     }
     else {
       setZoom(zoom => zoom - 3);

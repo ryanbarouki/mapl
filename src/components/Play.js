@@ -12,7 +12,14 @@ import { Link, useLocation } from 'react-router-dom';
 import BareAppleMap from './AppleMap.js';
 import { Share } from './Share.js';
 import { ToastContainer, Flip } from "react-toastify";
+import Spinner from 'react-spinkit';
 import 'react-toastify/dist/ReactToastify.css';
+
+const StyledSpinner = styled(Spinner)`
+  height: 5rem;
+  width: 5rem;
+  margin-bottom: 1rem;
+`;
 
 const Container = styled.div`
   width: 100%;
@@ -141,7 +148,7 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
           setZoom(end ? 2 : 13 - 3 * guesses.length);
           setAnswer({ latitude: Number(lat), longitude: Number(lon) });
           // setAnswer({ latitude: 51.5972, longitude: 0.1276 }); // Dev
-          setStart(true);
+          setTimeout(() => setStart(true), 2000);
           setName(`${city}, ${country}`)
         }
       })
@@ -169,7 +176,6 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
       setEnd(true);
       setZoom(2);
       const closestDistance = getClosestDistance(guesses);
-      console.log("closest distance", closestDistance);
       setScore(Math.round(calculateScore(Math.min(closestDistance, distance), num_guesses + 1, hints)));
     }
     else {
@@ -189,12 +195,13 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
       <Container>
         {!start &&
           <Screen $visible={!start} $end={false}>
+            <StyledSpinner name="cube-grid" color="#FFCB00" fadeIn={0} />
             <EndDiv>
               Loading Coordinates...
             </EndDiv>
           </Screen>
         }
-        {end && !breakdown &&
+        {start && end && !breakdown &&
           <Screen $visible={end} $end={true}>
             <EndDiv>You scored</EndDiv>
             <EndDiv><span>{score}</span>/10000</EndDiv>

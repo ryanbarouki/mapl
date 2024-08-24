@@ -27,6 +27,7 @@
     "react-map-gl": "^7.1.7",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
+    "react-spinkit": "^3.0.0",
     "react-toastify": "^10.0.5",
     "resize-observer-polyfill": "^1.5.1",
     "seedrandom": "^3.0.5",

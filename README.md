@@ -2,9 +2,6 @@
 Play at [mapl.life](https://mapl.life)
 
 ## Dev TODOs
-- make the breakdown zoom level closer
-- loading coords appears behind the screen at the end on daily
-- nicer loading screen
 - Multiple rounds
 - ability to go back to previous zoom levels of guesses?
 

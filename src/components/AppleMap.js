@@ -28,6 +28,7 @@ export default function BareAppleMap({ guesses, answer, name }) {
       isZoomEnabled={true}
       isScrollEnabled={true}
       allowWheelToZoom={true}
+      initialRegion={{ centerLatitude: answer.latitude, centerLongitude: answer.longitude, latitudeDelta: 20, longitudeDelta: 20 }}
     >
       {guesses.map((guess, index) => (
         <>

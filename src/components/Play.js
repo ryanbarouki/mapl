@@ -169,7 +169,8 @@ function Play({ guesses, addGuess, hints, setHints, random_seed }) {
       setEnd(true);
       setZoom(2);
       const closestDistance = getClosestDistance(guesses);
-      setScore(Math.round(calculateScore(closestDistance, num_guesses + 1, hints)));
+      console.log("closest distance", closestDistance);
+      setScore(Math.round(calculateScore(Math.min(closestDistance, distance), num_guesses + 1, hints)));
     }
     else {
       setZoom(zoom => zoom - 3);

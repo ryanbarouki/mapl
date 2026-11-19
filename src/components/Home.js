@@ -4,9 +4,52 @@ import { MAX_GUESSES, WIN_RADIUS, isRoundComplete } from '../roundRules';
 import { loadAll } from '../save_local';
 import { formatDistance } from './AppleMap';
 
+function DailyHistory({ today, dailyGuesses }) {
+  const days = Array.from({ length: 7 }, (_, index) => today.minus({ days: 6 - index }));
+  let streakDay = isRoundComplete(dailyGuesses[today.toISODate()] ?? []) ? today : today.minus({ days: 1 });
+  let streak = 0;
+  while (isRoundComplete(dailyGuesses[streakDay.toISODate()] ?? [])) {
+    streak += 1;
+    streakDay = streakDay.minus({ days: 1 });
+  }
+
+  return (
+    <section className="daily-history" aria-labelledby="daily-history-title">
+      <div className="daily-history-heading">
+        <h2 id="daily-history-title">Last 7 days</h2>
+        <span>{streak} {streak === 1 ? 'day' : 'days'} in a row</span>
+      </div>
+      <ol>
+        {days.map(day => {
+          const isoDay = day.toISODate();
+          const complete = isRoundComplete(dailyGuesses[isoDay] ?? []);
+          const description = `${day.toLocaleString(DateTime.DATE_FULL)} · ${complete ? 'Completed' : 'Incomplete'}`;
+          return (
+            <li key={isoDay}>
+              {complete ? (
+                <Link to={`/daily?day=${isoDay}`} aria-label={description} title={description}>
+                  <time dateTime={isoDay}>{day.toFormat('ccc')}</time>
+                  <span aria-hidden="true">✓</span>
+                </Link>
+              ) : (
+                <span className="daily-history-day">
+                  <span className="visually-hidden">{description}</span>
+                  <time dateTime={isoDay} aria-hidden="true">{day.toFormat('ccc')}</time>
+                  <span aria-hidden="true">–</span>
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
 export default function Home() {
   const today = DateTime.now();
-  const guesses = loadAll('guesses')[today.toISODate()] ?? [];
+  const dailyGuesses = loadAll('guesses');
+  const guesses = dailyGuesses[today.toISODate()] ?? [];
   const complete = isRoundComplete(guesses);
   const action = complete ? 'See today’s result' : guesses.length ? 'Continue puzzle' : 'Play today’s puzzle';
 
@@ -31,6 +74,7 @@ export default function Home() {
         </ol>
         <Link className="site-button" to="/daily">{action}</Link>
       </section>
+      <DailyHistory today={today} dailyGuesses={dailyGuesses} />
       <section className="random-card" aria-labelledby="random-title">
         <div>
           <h2 id="random-title">Random</h2>

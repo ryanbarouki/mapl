@@ -8,6 +8,7 @@ import ViewMap from './Map';
 import GuessMap from './GuessMapApple';
 import ResultMap, { formatDistance } from './AppleMap';
 import { Share } from './Share';
+import { trackChallengeOpen, trackChallengeGuess, trackChallengeComplete } from '../challengeAnalytics';
 import { MAX_GUESSES, MAX_SCORE, WIN_RADIUS, isRoundComplete } from '../roundRules';
 import './Play.css';
 
@@ -16,7 +17,7 @@ const MAPS = [
   '2ba07e07-1a5e-41b5-9c23-0b8d550d726e',
   '6b3f0bd3-eea3-4016-8e88-77937de021ca',
 ];
-const NUM_HINTS = MAPS.length - 1;
+const HINT_COST = 200;
 const CLUE_VIEWS = [
   { label: 'View 1', zoom: 13 },
   { label: 'View 2', zoom: 10 },
@@ -58,14 +59,18 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [showMap, setShowMap] = useState(false);
   const guessHeading = useRef(null);
+  const challengeOpened = useRef(false);
+  const challengeGuessLogged = useRef(false);
   const [selectedClueView, setSelectedClueView] = useState(null);
   const clueView = selectedClueView ?? guesses.length;
+  const numHints = daily ? MAPS.length - 1 : 1;
+  const analyticsMode = daily ? 'daily' : 'random';
   const closestDistance = Math.min(...guesses.map(guess => guess.distance));
   const won = closestDistance <= WIN_RADIUS;
   const finished = isRoundComplete(guesses);
   const mode = daily ? `Daily puzzle · ${DateTime.fromISO(seed).toLocaleString(DateTime.DATE_MED)}` : 'Random';
   const score = Math.round(
-    (MAX_SCORE - 1000 * (guesses.length - 1) - 200 * hints) *
+    (MAX_SCORE - 1000 * (guesses.length - 1) - HINT_COST * hints) *
     Math.exp(-closestDistance / 2000000)
   );
 
@@ -85,9 +90,24 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
     return () => controller.abort();
   }, [seed, loadAttempt]);
 
+  useEffect(() => {
+    if (targetScore !== null && !challengeOpened.current) {
+      challengeOpened.current = true;
+      trackChallengeOpen(analyticsMode);
+    }
+  }, [analyticsMode, targetScore]);
+
   function submitGuess(marker) {
     if (!answer || finished) return;
-    addGuess({ ...marker, distance: getDistance(marker, answer) });
+    const guess = { ...marker, distance: getDistance(marker, answer) };
+    addGuess(guess);
+    if (targetScore !== null) {
+      if (!challengeGuessLogged.current) {
+        challengeGuessLogged.current = true;
+        trackChallengeGuess(analyticsMode);
+      }
+      if (isRoundComplete([...guesses, guess])) trackChallengeComplete(analyticsMode);
+    }
     setSelectedClueView(null);
   }
 
@@ -141,11 +161,11 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
               {targetScore !== null && <p className="round-challenge">Friend’s score to beat <strong>{targetScore.toLocaleString()}</strong></p>}
             </div>
             <div className="round-hint">
-              <button className="site-button site-button-secondary" disabled={hints >= NUM_HINTS}
+              <button className="site-button site-button-secondary" disabled={hints >= numHints}
                 onClick={() => setHints(hints + 1)} aria-describedby="hint-cost">
-                Reveal hint ({hints}/{NUM_HINTS} used)
+                {daily ? `Reveal hint (${hints}/${numHints} used)` : hints ? 'Major roads highlighted' : 'Highlight major roads'}
               </button>
-              <span id="hint-cost">200 base points per hint</span>
+              <span id="hint-cost">{HINT_COST} base points{daily ? ' per hint' : ''}</span>
             </div>
           </header>
           <div className="round-status" aria-live="polite">
@@ -159,7 +179,7 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
                   guesses.length ? 'Zoomed out after your guess' : 'Look for roads, rivers and coastlines'}</span>
               </div>
               <div className="round-map">
-                <ViewMap zoom={CLUE_VIEWS[clueView].zoom} latitude={answer.latitude} longitude={answer.longitude} map={MAPS[hints]} />
+                <ViewMap zoom={CLUE_VIEWS[clueView].zoom} latitude={answer.latitude} longitude={answer.longitude} map={MAPS[daily ? hints : 0]} highlightMajorRoads={!daily && hints > 0} />
               </div>
               {guesses.length > 0 && (
                 <div className="round-clue-views" role="group" aria-label="Clue map zoom">

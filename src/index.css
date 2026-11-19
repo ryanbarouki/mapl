@@ -353,3 +353,61 @@ a {
     justify-content: space-between;
   }
 }
+
+.daily-history {
+  padding: .9rem clamp(.75rem, 3vw, 1.25rem);
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius);
+  background: var(--site-surface);
+}
+
+.daily-history-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .35rem .75rem;
+}
+
+.daily-history-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.daily-history-heading > span {
+  color: var(--site-muted);
+  font-size: .875rem;
+}
+
+.daily-history ol {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: .25rem;
+  margin: .65rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.daily-history a, .daily-history-day {
+  display: grid;
+  justify-items: center;
+  gap: .15rem;
+  min-height: 2.75rem;
+  padding: .25rem .1rem;
+  border: 1px solid var(--site-border);
+  border-radius: .4rem;
+  color: var(--site-muted);
+  font-size: .8rem;
+  text-decoration: none;
+}
+
+.daily-history a {
+  border-color: #a0c3ad;
+  background: #e0f2e7;
+  color: #22563b;
+  font-weight: 700;
+}
+
+.daily-history a:hover {
+  border-color: currentColor;
+}

@@ -3,7 +3,9 @@ import { MemoryRouter } from 'react-router-dom';
 import { DateTime } from 'luxon';
 import App from './App';
 
-jest.mock('./components/Map', () => ({ zoom }) => <output aria-label="Clue zoom">{zoom}</output>);
+jest.mock('./components/Map', () => ({ zoom, highlightMajorRoads }) => (
+  <output aria-label="Clue zoom" data-roads-highlighted={Boolean(highlightMajorRoads)}>{zoom}</output>
+));
 jest.mock('mapkit-react', () => ({
   Map: () => <div aria-label="Apple map" />,
   Marker: () => null,
@@ -36,9 +38,12 @@ let originalFetch;
 let originalClipboard;
 let writeText;
 let originalMapEnv;
+let originalGtag;
 
 beforeEach(() => {
   originalFetch = global.fetch;
+  originalGtag = window.gtag;
+  window.gtag = jest.fn();
   originalMapEnv = process.env;
   process.env = {
     ...originalMapEnv,
@@ -57,6 +62,7 @@ beforeEach(() => {
 
 afterEach(() => {
   global.fetch = originalFetch;
+  window.gtag = originalGtag;
   process.env = originalMapEnv;
   if (originalClipboard) Object.defineProperty(navigator, 'clipboard', originalClipboard);
   else delete navigator.clipboard;
@@ -77,7 +83,9 @@ test('random mode shows distance after a miss and shares a spoiler-free result',
   expect(screen.queryByLabelText('Apple map')).toBeNull();
   await guess('Pin a distant guess');
   expect(screen.getByText('Zoomed out after your guess')).toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: /reveal hint/i }));
+  fireEvent.click(screen.getByRole('button', { name: 'Highlight major roads' }));
+  expect(screen.getByRole('button', { name: 'Major roads highlighted' })).toBeDisabled();
+  expect(screen.getByLabelText('Clue zoom')).toHaveAttribute('data-roads-highlighted', 'true');
   await guess('Pin the target');
   expect(screen.getByRole('heading', { name: 'Test City, Test Country' })).toBeInTheDocument();
 
@@ -92,7 +100,7 @@ test('random mode shows distance after a miss and shares a spoiler-free result',
 
   fireEvent.click(screen.getByRole('button', { name: 'Play again' }));
   expect(await screen.findByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
-  expect(screen.getByRole('button', { name: /0\/2 used/i })).toBeEnabled();
+  expect(screen.getByRole('button', { name: 'Highlight major roads' })).toBeEnabled();
 });
 
 test('a saved early Daily win reopens as complete and offers manual copying', async () => {
@@ -186,6 +194,11 @@ test('Random challenge links reopen the same location and replay clears the chal
   await guess('Pin the target');
   expect(screen.getByRole('heading', { name: 'Test City, Test Country' })).toBeInTheDocument();
   expect(screen.getByText('You beat the challenge!')).toBeInTheDocument();
+  expect(window.gtag.mock.calls).toEqual([
+    ['event', 'challenge_open', { game_mode: 'random' }],
+    ['event', 'challenge_first_guess', { game_mode: 'random' }],
+    ['event', 'challenge_complete', { game_mode: 'random' }],
+  ]);
 
   fireEvent.click(screen.getByRole('button', { name: 'Challenge a friend' }));
   expect(await screen.findByText(/score copied/i)).toBeInTheDocument();
@@ -208,7 +221,7 @@ test('clue zoom can revisit unlocked views and advances after each guess', async
   fireEvent.click(screen.getByRole('button', { name: 'View 1' }));
   expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('13');
   expect(screen.getByRole('button', { name: 'View 1' })).toHaveAttribute('aria-pressed', 'true');
-  expect(screen.getByRole('button', { name: /0\/2 used/i })).toBeEnabled();
+  expect(screen.getByRole('button', { name: 'Highlight major roads' })).toBeEnabled();
 
   await guess('Pin a distant guess');
   expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('7');
@@ -225,4 +238,27 @@ test('players can jump to the guess map and get instructions after placing a pin
   expect(screen.getByText('Tap or click the map to place a pin.')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Pin a distant guess' }));
   expect(screen.getByText('Move your pin or confirm.')).toBeInTheDocument();
+});
+
+test('Daily history counts a completed loss toward the streak and links to past results', () => {
+  const yesterday = DateTime.now().minus({ days: 1 }).toISODate();
+  const twoDaysAgo = DateTime.now().minus({ days: 2 }).toISODate();
+  localStorage.setItem('guesses', JSON.stringify({
+    [yesterday]: [{ distance: 100000 }, { distance: 110000 }, { distance: 120000 }],
+    [twoDaysAgo]: [{ distance: 0 }],
+  }));
+  openGame('/');
+  expect(screen.getByText('2 days in a row')).toBeInTheDocument();
+  const completed = screen.getAllByRole('link', { name: /· Completed$/ });
+  expect(completed).toHaveLength(2);
+  expect(completed[1]).toHaveAttribute('href', `/daily?day=${yesterday}`);
+});
+
+test('a later visit within seven days of opening a challenge is counted once', () => {
+  localStorage.setItem('mapl:first-challenge-day', DateTime.now().minus({ days: 2 }).toISODate());
+  const visit = openGame('/');
+  expect(window.gtag).toHaveBeenCalledWith('event', 'challenge_return_7d', {});
+  visit.unmount();
+  openGame('/');
+  expect(window.gtag).toHaveBeenCalledTimes(1);
 });

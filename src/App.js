@@ -1,5 +1,6 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { trackChallengeReturn } from './challengeAnalytics';
 import { Main } from './components/Main';
 import HowToPlay from './components/HowToPlay';
 import Home from './components/Home';
@@ -7,7 +8,19 @@ import Footer from './components/Footer';
 
 export default function App() {
   const [openHowTo, setOpenHowTo] = useState(false);
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    trackChallengeReturn();
+  }, [pathname, search]);
+
+  useEffect(() => {
+    function trackVisibleReturn() {
+      if (document.visibilityState === 'visible') trackChallengeReturn();
+    }
+    document.addEventListener('visibilitychange', trackVisibleReturn);
+    return () => document.removeEventListener('visibilitychange', trackVisibleReturn);
+  }, []);
 
   return (
     <div className="site-shell">

@@ -1,10 +1,10 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { DateTime } from 'luxon';
 import App from './App';
 
-jest.mock('./components/Map', () => ({ zoom, highlightMajorRoads }) => (
-  <output aria-label="Clue zoom" data-roads-highlighted={Boolean(highlightMajorRoads)}>{zoom}</output>
+jest.mock('./components/Map', () => ({ zoom, map }) => (
+  <output aria-label="Clue zoom" data-map-style={map}>{zoom}</output>
 ));
 jest.mock('mapkit-react', () => ({
   Map: () => <div aria-label="Apple map" />,
@@ -53,7 +53,7 @@ beforeEach(() => {
   originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
   global.fetch = jest.fn().mockResolvedValue({
     ok: true,
-    text: async () => 'city,city_ascii,lat,lng,country\nTest City,Test City,51,0,Test Country',
+    text: async () => 'city,city_ascii,lat,lng,country,iso2\nTest City,Test City,51,0,Test Country,GB',
   });
   writeText = jest.fn().mockResolvedValue(undefined);
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
@@ -83,9 +83,8 @@ test('random mode shows distance after a miss and shares a spoiler-free result',
   expect(screen.queryByLabelText('Apple map')).toBeNull();
   await guess('Pin a distant guess');
   expect(screen.getByText('Zoomed out after your guess')).toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: 'Highlight major roads' }));
-  expect(screen.getByRole('button', { name: 'Major roads highlighted' })).toBeDisabled();
-  expect(screen.getByLabelText('Clue zoom')).toHaveAttribute('data-roads-highlighted', 'true');
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' }));
+  expect(screen.getByRole('button', { name: 'Reveal border or region (1/4 used)' })).toBeEnabled();
   await guess('Pin the target');
   expect(screen.getByRole('heading', { name: 'Test City, Test Country' })).toBeInTheDocument();
 
@@ -93,14 +92,14 @@ test('random mode shows distance after a miss and shares a spoiler-free result',
   expect(await screen.findByText(/score copied/i)).toBeInTheDocument();
   const [text] = writeText.mock.calls[0];
   expect(text).toContain('Mapl Random');
-  expect(text).toContain('8,800/10,000 · 2/3 guesses');
+  expect(text).toContain('8,760/10,000 · 2/3 guesses');
   expect(text).toContain('🟥🟩⬜');
   expect(text).toContain('1 hint');
   expect(text).not.toContain('Test City');
 
   fireEvent.click(screen.getByRole('button', { name: 'Play again' }));
   expect(await screen.findByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
-  expect(screen.getByRole('button', { name: 'Highlight major roads' })).toBeEnabled();
+  expect(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' })).toBeEnabled();
 });
 
 test('a saved early Daily win reopens as complete and offers manual copying', async () => {
@@ -158,8 +157,8 @@ test('Daily challenges share natively and open the same dated puzzle for compari
   try {
     openGame(`/daily?day=${day}&score=8750`);
     expect(await screen.findByText('8,750')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /0\/2 used/i })).toBeEnabled();
-    fireEvent.click(screen.getByRole('button', { name: /reveal hint/i }));
+    expect(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' })).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' }));
     await guess('Pin the target');
     expect(screen.getByText('You beat the challenge!')).toBeInTheDocument();
 
@@ -167,11 +166,11 @@ test('Daily challenges share natively and open the same dated puzzle for compari
     expect(share).toHaveBeenCalledWith({
       title: `Mapl Daily · ${day}`,
       text: expect.stringContaining('Can you beat my score?'),
-      url: expect.stringContaining(`/daily?day=${day}&score=9800`),
+      url: expect.stringContaining(`/daily?day=${day}&score=9700`),
     });
     expect(share.mock.calls[0][0].text).not.toContain('Test City');
     expect(JSON.parse(localStorage.getItem('guesses'))[day]).toHaveLength(1);
-    expect(JSON.parse(localStorage.getItem('hints'))).toEqual({ [today]: 2, [day]: 1 });
+    expect(JSON.parse(localStorage.getItem('hints'))).toEqual({ [today]: 2, [day]: { count: 1, penalty: 300 } });
   } finally {
     if (originalShare) Object.defineProperty(navigator, 'share', originalShare);
     else delete navigator.share;
@@ -221,7 +220,7 @@ test('clue zoom can revisit unlocked views and advances after each guess', async
   fireEvent.click(screen.getByRole('button', { name: 'View 1' }));
   expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('13');
   expect(screen.getByRole('button', { name: 'View 1' })).toHaveAttribute('aria-pressed', 'true');
-  expect(screen.getByRole('button', { name: 'Highlight major roads' })).toBeEnabled();
+  expect(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' })).toBeEnabled();
 
   await guess('Pin a distant guess');
   expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('7');
@@ -261,4 +260,141 @@ test('a later visit within seven days of opening a challenge is counted once', (
   visit.unmount();
   openGame('/');
   expect(window.gtag).toHaveBeenCalledTimes(1);
+});
+
+test('the Random menu link starts a fresh round from an active Random game', async () => {
+  openGame('/play');
+  await guess('Pin a distant guess');
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' }));
+  expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('10');
+
+  fireEvent.click(screen.getByRole('link', { name: 'Random' }));
+  expect(await screen.findByLabelText('Clue zoom')).toHaveTextContent('13');
+  expect(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' })).toBeEnabled();
+  expect(screen.getByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
+  expect(global.fetch).toHaveBeenCalledTimes(2);
+});
+
+test('hints reveal the continent, a land neighbor, and finally the country and labeled map', async () => {
+  openGame('/play');
+  const map = await screen.findByLabelText('Clue zoom');
+  const redactedStyle = map.getAttribute('data-map-style');
+  expect(screen.getByText('Costs 300 points')).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' }));
+  expect(screen.getByText('Europe')).toBeInTheDocument();
+  expect(screen.getByText('Costs 600 points')).toBeInTheDocument();
+  expect(map).toHaveAttribute('data-map-style', redactedStyle);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal border or region (1/4 used)' }));
+  expect(screen.getByText('Ireland')).toBeInTheDocument();
+  expect(screen.getByText('Costs 1,000 points')).toBeInTheDocument();
+  expect(map).toHaveAttribute('data-map-style', redactedStyle);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal country (2/4 used)' }));
+  expect(screen.getByText('Test Country')).toBeInTheDocument();
+  expect(screen.getByText('Costs 1,500 points')).toBeInTheDocument();
+  expect(map).toHaveAttribute('data-map-style', redactedStyle);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal map names (3/4 used)' }));
+  expect(map).toHaveAttribute('data-map-style', '6b3f0bd3-eea3-4016-8e88-77937de021ca');
+  expect(screen.getByRole('button', { name: 'All hints revealed (4/4 used)' })).toBeDisabled();
+  expect(screen.getByText('3,400 base points spent on hints')).toBeInTheDocument();
+  await guess('Pin the target');
+  expect(screen.getByText('6,600')).toBeInTheDocument();
+});
+
+test('a country without land borders gets a region for the second hint', async () => {
+  global.fetch.mockResolvedValue({
+    ok: true,
+    text: async () => 'city,city_ascii,lat,lng,country,iso2\nTokyo,Tokyo,35.6897,139.6922,Japan,JP',
+  });
+  openGame('/daily');
+
+  fireEvent.click(await screen.findByRole('button', { name: 'Reveal continent (0/4 used)' }));
+  expect(screen.getByText('Asia')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal border or region (1/4 used)' }));
+  expect(screen.getByText('Eastern Asia')).toBeInTheDocument();
+});
+
+test('an older Daily save keeps its old hint cost when it buys a new hint', async () => {
+  const day = DateTime.now().toISODate();
+  localStorage.setItem('hints', JSON.stringify({ [day]: 2 }));
+  openGame('/daily');
+
+  fireEvent.click(await screen.findByRole('button', { name: 'Reveal country (2/4 used)' }));
+  await guess('Pin the target');
+  expect(screen.getByText('8,600')).toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem('hints'))[day]).toEqual({ count: 3, penalty: 1400 });
+});
+
+test('the full-screen clue map shares zoom controls and returns to the pending guess', async () => {
+  openGame('/play');
+  await guess('Pin a distant guess');
+  fireEvent.click(screen.getByRole('button', { name: 'Pin the target' }));
+
+  const dialog = document.getElementById('clue-fullscreen');
+  dialog.showModal = () => { dialog.open = true; };
+  dialog.close = () => {
+    dialog.open = false;
+    fireEvent(dialog, new Event('close'));
+  };
+  fireEvent.click(screen.getByRole('button', { name: 'Full screen' }));
+
+  const expanded = within(screen.getByRole('dialog', { name: 'Clue map' }));
+  expect(expanded.getByLabelText('Clue zoom')).toHaveTextContent('10');
+  fireEvent.click(expanded.getByRole('button', { name: 'View 1' }));
+  expect(expanded.getByLabelText('Clue zoom')).toHaveTextContent('13');
+  fireEvent.click(expanded.getByRole('button', { name: 'Back to guess' }));
+
+  expect(screen.queryByRole('dialog', { name: 'Clue map' })).not.toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Your guess' })).toHaveFocus();
+  expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('13');
+  expect(screen.getByRole('button', { name: 'Confirm guess' })).toBeEnabled();
+});
+
+test('hint prices drop after each guess and only the price paid is deducted', async () => {
+  openGame('/play');
+  expect(await screen.findByText('Costs 300 points')).toBeInTheDocument();
+
+  await guess('Pin a distant guess');
+  expect(screen.getByText('Costs 240 points')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' }));
+  expect(screen.getByText('Costs 480 points')).toBeInTheDocument();
+
+  await guess('Pin a distant guess');
+  expect(screen.getByText('Costs 360 points')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Reveal border or region (1/4 used)' }));
+  await guess('Pin the target');
+  expect(screen.getByText('7,400')).toBeInTheDocument();
+});
+
+test('the full-screen guess map keeps the same map and lets players confirm a pin', async () => {
+  openGame('/play');
+  const map = await screen.findByLabelText('MapTiler map');
+  fireEvent.click(within(map).getByRole('button', { name: 'Pin a distant guess' }));
+
+  const dialog = document.getElementById('guess-fullscreen');
+  dialog.showModal = () => { dialog.open = true; };
+  dialog.close = () => {
+    dialog.open = false;
+    fireEvent(dialog, new Event('close'));
+  };
+  fireEvent.click(screen.getByRole('button', { name: 'Full screen guess map' }));
+
+  const expanded = within(screen.getByRole('dialog', { name: 'Guess map' }));
+  expect(expanded.getByLabelText('MapTiler map')).toBe(map);
+  expect(expanded.getByRole('button', { name: 'Confirm guess' })).toBeEnabled();
+  fireEvent.click(expanded.getByRole('button', { name: 'Close full screen' }));
+  expect(screen.getByLabelText('MapTiler map')).toBe(map);
+  expect(screen.getByRole('button', { name: 'Confirm guess' })).toBeEnabled();
+
+  fireEvent.click(screen.getByRole('button', { name: 'Full screen guess map' }));
+  fireEvent.click(expanded.getByRole('button', { name: 'Confirm guess' }));
+  expect(screen.getByRole('dialog', { name: 'Guess map' })).toBeInTheDocument();
+  expect(expanded.getByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
+  fireEvent.click(expanded.getByRole('button', { name: 'Pin the target' }));
+  fireEvent.click(expanded.getByRole('button', { name: 'Confirm guess' }));
+  expect(screen.getByRole('heading', { name: 'Test City, Test Country' })).toBeInTheDocument();
+  expect(screen.queryByRole('dialog', { name: 'Guess map' })).not.toBeInTheDocument();
 });

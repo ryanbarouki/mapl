@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DateTime } from 'luxon';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { MAX_SCORE } from '../roundRules';
 import Play from './Play';
 import { useGuesses } from '../Hooks/useGuesses';
@@ -25,12 +25,13 @@ export function DailyPlay() {
 
 function DailyRound({ day, targetScore }) {
   const [guesses, addGuess] = useGuesses(day);
-  const [hints, setHints] = useStore('hints', day, 'number');
+  const [hintState, setHintState] = useStore('hints', day, 'number');
 
-  return <Play guesses={guesses} addGuess={addGuess} hints={hints} setHints={setHints} seed={day} daily targetScore={targetScore} />;
+  return <Play guesses={guesses} addGuess={addGuess} hintState={hintState} setHintState={setHintState} seed={day} daily targetScore={targetScore} />;
 }
 
 export function NormalPlay() {
+  const { key: navigationKey } = useLocation();
   const [params, setParams] = useSearchParams();
   const rawSeed = params.get('seed');
   const parsedSeed = Number(rawSeed);
@@ -38,7 +39,7 @@ export function NormalPlay() {
   const targetScore = challengeSeed === null ? null : readChallengeScore(params);
 
   return (
-    <RandomRound key={challengeSeed ?? 'random'} challengeSeed={challengeSeed} targetScore={targetScore}
+    <RandomRound key={challengeSeed ?? navigationKey} challengeSeed={challengeSeed} targetScore={targetScore}
       leaveChallenge={() => setParams({}, { replace: true })} />
   );
 }
@@ -46,7 +47,7 @@ export function NormalPlay() {
 function RandomRound({ challengeSeed, targetScore, leaveChallenge }) {
   const [seed, setSeed] = useState(() => challengeSeed ?? Math.random());
   const [guesses, setGuesses] = useState([]);
-  const [hints, setHints] = useState(0);
+  const [hintState, setHintState] = useState(0);
 
   function replay() {
     if (challengeSeed !== null) {
@@ -54,12 +55,12 @@ function RandomRound({ challengeSeed, targetScore, leaveChallenge }) {
       return;
     }
     setGuesses([]);
-    setHints(0);
+    setHintState(0);
     setSeed(Math.random());
   }
 
   return (
-    <Play key={seed} seed={seed} guesses={guesses} hints={hints} setHints={setHints}
+    <Play key={seed} seed={seed} guesses={guesses} hintState={hintState} setHintState={setHintState}
       addGuess={guess => setGuesses(previous => [...previous, guess])} onReplay={replay} targetScore={targetScore} />
   );
 }

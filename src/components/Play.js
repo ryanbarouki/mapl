@@ -4,20 +4,26 @@ import { DateTime } from 'luxon';
 import Papa from 'papaparse';
 import seedrandom from 'seedrandom';
 import { Link } from 'react-router-dom';
+import { HiArrowsPointingOut } from 'react-icons/hi2';
 import ViewMap from './Map';
 import GuessMap from './GuessMapApple';
 import ResultMap, { formatDistance } from './AppleMap';
 import { Share } from './Share';
+import countryHints from '../countryHints.json';
 import { trackChallengeOpen, trackChallengeGuess, trackChallengeComplete } from '../challengeAnalytics';
 import { MAX_GUESSES, MAX_SCORE, WIN_RADIUS, isRoundComplete } from '../roundRules';
 import './Play.css';
 
-const MAPS = [
-  'e88d9cf7-c88c-40cb-9510-bb1f7a29c306',
-  '2ba07e07-1a5e-41b5-9c23-0b8d550d726e',
-  '6b3f0bd3-eea3-4016-8e88-77937de021ca',
+const REDACTED_MAP = 'e88d9cf7-c88c-40cb-9510-bb1f7a29c306';
+const LABELED_MAP = '6b3f0bd3-eea3-4016-8e88-77937de021ca';
+const LEGACY_HINT_COST = 200;
+const HINT_PRICE_MULTIPLIERS = [1, 0.8, 0.6];
+const HINTS = [
+  { label: 'Reveal continent', cost: 300 },
+  { label: 'Reveal border or region', cost: 600 },
+  { label: 'Reveal country', cost: 1000 },
+  { label: 'Reveal map names', cost: 1500 },
 ];
-const HINT_COST = 200;
 const CLUE_VIEWS = [
   { label: 'View 1', zoom: 13 },
   { label: 'View 2', zoom: 10 },
@@ -29,12 +35,24 @@ function getLocation(csv, seed) {
   const index = Math.floor(seedrandom.alea(seed)() * rows.length);
   // Keep the existing daily selection unless it lands on the header or a blank row.
   for (const row of [rows[index], rows[1]]) {
-    const [city, , lat, lon, country] = row ?? [];
+    const [city, , lat, lon, country, iso2] = row ?? [];
     const latitude = Number(lat);
     const longitude = Number(lon);
     if (city && country && lat?.trim() && lon?.trim() &&
         Number.isFinite(latitude) && Number.isFinite(longitude)) {
-      return { latitude, longitude, name: `${city}, ${country}` };
+      const geography = countryHints.countries[iso2];
+      const borderIndex = geography?.borders.length
+        ? Math.floor(seedrandom.alea(`border:${seed}`)() * geography.borders.length)
+        : -1;
+      return {
+        latitude,
+        longitude,
+        name: `${city}, ${country}`,
+        country,
+        continent: geography?.continent,
+        region: geography?.region,
+        neighbor: geography?.borders[borderIndex],
+      };
     }
   }
   throw new Error('No playable location found');
@@ -53,24 +71,33 @@ function AttemptList({ guesses }) {
   );
 }
 
-export default function Play({ guesses, addGuess, hints, setHints, seed, daily, onReplay, targetScore = null }) {
+export default function Play({ guesses, addGuess, hintState, setHintState, seed, daily, onReplay, targetScore = null }) {
   const [answer, setAnswer] = useState(null);
   const [loadError, setLoadError] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [showMap, setShowMap] = useState(false);
   const guessHeading = useRef(null);
+  const clueDialog = useRef(null);
+  const [clueExpanded, setClueExpanded] = useState(false);
   const challengeOpened = useRef(false);
   const challengeGuessLogged = useRef(false);
   const [selectedClueView, setSelectedClueView] = useState(null);
+  // Daily rounds saved before escalating prices used a numeric hint count.
+  const { count: hints, penalty: hintPenalty } = typeof hintState === 'number'
+    ? { count: hintState, penalty: hintState * LEGACY_HINT_COST }
+    : hintState;
+  const nextHint = HINTS[hints];
+  const hintPriceMultiplier = HINT_PRICE_MULTIPLIERS[Math.min(guesses.length, MAX_GUESSES - 1)];
+  const nextHintCost = nextHint ? Math.round(nextHint.cost * hintPriceMultiplier) : 0;
+  const namesRevealed = hints >= HINTS.length;
   const clueView = selectedClueView ?? guesses.length;
-  const numHints = daily ? MAPS.length - 1 : 1;
   const analyticsMode = daily ? 'daily' : 'random';
   const closestDistance = Math.min(...guesses.map(guess => guess.distance));
   const won = closestDistance <= WIN_RADIUS;
   const finished = isRoundComplete(guesses);
   const mode = daily ? `Daily puzzle · ${DateTime.fromISO(seed).toLocaleString(DateTime.DATE_MED)}` : 'Random';
   const score = Math.round(
-    (MAX_SCORE - 1000 * (guesses.length - 1) - HINT_COST * hints) *
+    (MAX_SCORE - 1000 * (guesses.length - 1) - hintPenalty) *
     Math.exp(-closestDistance / 2000000)
   );
 
@@ -111,11 +138,44 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
     setSelectedClueView(null);
   }
 
+  function renderClueMap(fullscreen = false) {
+    const showClue = fullscreen || !clueExpanded;
+    return (
+      <>
+        <div className="round-map">
+          {showClue && (
+            <ViewMap zoom={CLUE_VIEWS[clueView].zoom} latitude={answer.latitude} longitude={answer.longitude}
+              map={namesRevealed ? LABELED_MAP : REDACTED_MAP} />
+          )}
+          {!fullscreen && (
+            <button className="site-button site-button-secondary round-expand-map"
+              aria-label="Full screen" aria-haspopup="dialog" aria-controls="clue-fullscreen" onClick={() => {
+                clueDialog.current.showModal();
+                setClueExpanded(true);
+              }}>
+              <HiArrowsPointingOut size={20} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+        {showClue && guesses.length > 0 && (
+          <div className="round-clue-views" role="group" aria-label="Clue map zoom">
+            {CLUE_VIEWS.slice(0, guesses.length + 1).map(({ label }, index) => (
+              <button key={label} className="site-button site-button-secondary"
+                aria-pressed={clueView === index} onClick={() => setSelectedClueView(index)}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <main className="round">
       {!answer ? (
         <section className="round-summary" aria-labelledby="loading-title">
-          <h1 id="loading-title">{loadError ? 'Couldn’t load the round' : 'Finding your location…'}</h1>
+          <h1 id="loading-title">{loadError ? 'Couldn’t load the round' : 'Loading the puzzle…'}</h1>
           {loadError && (
             <button className="site-button" onClick={() => {
               setLoadError(false);
@@ -157,19 +217,36 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
           <header className="round-header">
             <div>
               <p className="round-mode">{mode}</p>
-              <h1>Find the location</h1>
+              <h1>Where on Earth is this?!</h1>
               {targetScore !== null && <p className="round-challenge">Friend’s score to beat <strong>{targetScore.toLocaleString()}</strong></p>}
             </div>
             <div className="round-hint">
-              <button className="site-button site-button-secondary" disabled={hints >= numHints}
-                onClick={() => setHints(hints + 1)} aria-describedby="hint-cost">
-                {daily ? `Reveal hint (${hints}/${numHints} used)` : hints ? 'Major roads highlighted' : 'Highlight major roads'}
+              <button className="site-button site-button-secondary" disabled={namesRevealed}
+                onClick={() => setHintState({ count: hints + 1, penalty: hintPenalty + nextHintCost })}
+                aria-describedby="hint-cost">
+                {nextHint?.label ?? 'All hints revealed'} ({hints}/{HINTS.length} used)
               </button>
-              <span id="hint-cost">{HINT_COST} base points{daily ? ' per hint' : ''}</span>
+              <span id="hint-cost">
+                {nextHint ? `Costs ${nextHintCost.toLocaleString()} points` :
+                  `${hintPenalty.toLocaleString()} base points spent on hints`}
+              </span>
             </div>
           </header>
           <div className="round-status" aria-live="polite">
             <AttemptList guesses={guesses} />
+            {hints > 0 && (
+              <ul className="round-revealed-hints" aria-label="Revealed hints">
+                <li>Continent <strong>{answer.continent ?? 'Unavailable'}</strong></li>
+                {hints >= 2 && (
+                  <li>
+                    {answer.neighbor ? 'Bordering country' : 'Region'}{' '}
+                    <strong>{answer.neighbor ?? answer.region ?? 'Unavailable'}</strong>
+                  </li>
+                )}
+                {hints >= 3 && <li>Country <strong>{answer.country}</strong></li>}
+                {namesRevealed && <li>Place names are visible on the clue map</li>}
+              </ul>
+            )}
           </div>
           <div className="round-board">
             <section className="round-panel" aria-labelledby="clue-title">
@@ -178,19 +255,7 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
                 <span>{clueView < guesses.length ? 'Reviewing an earlier clue view' :
                   guesses.length ? 'Zoomed out after your guess' : 'Look for roads, rivers and coastlines'}</span>
               </div>
-              <div className="round-map">
-                <ViewMap zoom={CLUE_VIEWS[clueView].zoom} latitude={answer.latitude} longitude={answer.longitude} map={MAPS[daily ? hints : 0]} highlightMajorRoads={!daily && hints > 0} />
-              </div>
-              {guesses.length > 0 && (
-                <div className="round-clue-views" role="group" aria-label="Clue map zoom">
-                  {CLUE_VIEWS.slice(0, guesses.length + 1).map(({ label }, index) => (
-                    <button key={label} className="site-button site-button-secondary"
-                      aria-pressed={clueView === index} onClick={() => setSelectedClueView(index)}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {renderClueMap()}
               <div className="round-jump-to-guess">
                 <button className="site-button" onClick={() => guessHeading.current.focus()}>
                   Make a guess
@@ -201,6 +266,23 @@ export default function Play({ guesses, addGuess, hints, setHints, seed, daily, 
               <GuessMap handleGuess={submitGuess} guesses={guesses} headingRef={guessHeading} />
             </section>
           </div>
+          <dialog id="clue-fullscreen" className="round-map-fullscreen" ref={clueDialog}
+            aria-labelledby="clue-fullscreen-title" onClose={() => setClueExpanded(false)}>
+            {clueExpanded && (
+              <>
+                <div className="round-panel-heading">
+                  <h2 id="clue-fullscreen-title">Clue map</h2>
+                  <button className="site-button" onClick={() => {
+                    clueDialog.current.close();
+                    guessHeading.current.focus();
+                  }}>
+                    Back to guess
+                  </button>
+                </div>
+                {renderClueMap(true)}
+              </>
+            )}
+          </dialog>
         </>
       )}
     </main>

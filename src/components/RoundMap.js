@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Annotation, Map as AppleMap, Marker as AppleMarker } from 'mapkit-react';
 import Map, { Marker, NavigationControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { collapseMobileAttribution } from './mapAttribution';
 
 function canUseAppleMap(token) {
   if (!token) return false;
@@ -23,7 +24,7 @@ function canUseAppleMap(token) {
   }
 }
 
-export default function RoundMap({ pins, onPick, initialRegion, initialViewState }) {
+export default function RoundMap({ pins, onPick, initialRegion, initialViewState, compactControls = false }) {
   const appleToken = process.env.REACT_APP_MAPKIT_JWT;
   const mapTilerKey = process.env.REACT_APP_MAPTILER_KEY;
   const [useApple, setUseApple] = useState(() => canUseAppleMap(appleToken));
@@ -39,6 +40,7 @@ export default function RoundMap({ pins, onPick, initialRegion, initialViewState
     return (
       <>
         <AppleMap token={appleToken} initialRegion={initialRegion} allowWheelToZoom
+          showsMapTypeControl={!compactControls} showsZoomControl={!compactControls}
           onLoad={() => setAppleLoaded(true)}
           onSingleTap={onPick && (event => onPick(event.toCoordinates()))}>
           {pins.map(({ id, latitude, longitude, color, label }) => (
@@ -72,6 +74,7 @@ export default function RoundMap({ pins, onPick, initialRegion, initialViewState
         longitude: event.lngLat.wrap().lng,
       }))}
       style={{ width: '100%', height: '100%' }}
+      onLoad={collapseMobileAttribution}
       mapStyle={`https://api.maptiler.com/maps/streets/style.json?key=${encodeURIComponent(mapTilerKey)}`}>
       <NavigationControl showCompass={false} />
       {pins.map(({ id, latitude, longitude, color, label }) => (

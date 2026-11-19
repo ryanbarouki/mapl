@@ -1,12 +1,14 @@
 :root {
   --app-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --site-bg: #f6f3ec;
+  --site-bg: #faf7ec;
   --site-surface: #fff;
-  --site-ink: #302338;
-  --site-muted: #625669;
-  --site-border: #d9d0db;
-  --site-accent: #593784;
-  --site-accent-hover: #422664;
+  --site-ink: #29251c;
+  --site-muted: #605747;
+  --site-border: #ded4b5;
+  --site-accent: #705300;
+  --site-yellow: #ffcb00;
+  --site-yellow-hover: #ebb700;
+  --site-yellow-tint: #fff1ad;
   --site-pin: #b54734;
   --site-radius: 1rem;
   --site-width: 88rem;
@@ -95,7 +97,7 @@ a {
   aspect-ratio: 1;
   border: 2px solid var(--site-ink);
   border-radius: .23em;
-  background: #f8d477;
+  background: var(--site-yellow);
   box-shadow: 2px 2px 0 var(--site-ink);
 }
 
@@ -112,7 +114,7 @@ a {
   position: absolute;
   inset: 31%;
   border-radius: 50%;
-  background: #f8d477;
+  background: var(--site-yellow);
   content: "";
 }
 
@@ -138,7 +140,7 @@ a {
 }
 
 .site-nav :is(a, button):hover, .site-nav a[aria-current='page'] {
-  background: var(--site-bg);
+  background: var(--site-yellow-tint);
   color: var(--site-accent);
 }
 
@@ -150,8 +152,8 @@ a {
   padding: .6rem 1rem;
   border: 1px solid transparent;
   border-radius: .6rem;
-  background: var(--site-accent);
-  color: white;
+  background: var(--site-yellow);
+  color: var(--site-ink);
   font: 700 1rem var(--app-font);
   text-align: center;
   text-decoration: none;
@@ -159,7 +161,7 @@ a {
 }
 
 .site-button:hover:not(:disabled) {
-  background: var(--site-accent-hover);
+  background: var(--site-yellow-hover);
 }
 
 .site-button-secondary {
@@ -169,12 +171,12 @@ a {
 }
 
 .site-button-secondary:hover:not(:disabled) {
-  background: var(--site-bg);
+  background: var(--site-yellow-tint);
   border-color: var(--site-accent);
 }
 
 .site-button:disabled {
-  background: #ebe5ee;
+  background: #eee9da;
   color: var(--site-muted);
   cursor: default;
 }
@@ -201,6 +203,7 @@ a {
 }
 
 .daily-card {
+  background: linear-gradient(180deg, #fff7d4, var(--site-surface) 12rem);
   border: 2px solid var(--site-ink);
   box-shadow: 4px 4px 0 var(--site-ink);
 }
@@ -327,7 +330,7 @@ a {
 }
 
 .site-dialog::backdrop {
-  background: #30233886;
+  background: #29251c86;
 }
 
 .site-dialog h2 {

@@ -233,7 +233,7 @@
 }
 
 .round .round-map-message {
-  color: #172a26;
+  color: var(--site-ink);
   padding: 1rem;
 }
 
@@ -273,7 +273,7 @@
 }
 
 .round-clue-views .site-button[aria-pressed="true"] {
-  background: var(--site-bg);
+  background: var(--site-yellow-tint);
   border-color: var(--site-accent);
 }
 
@@ -285,5 +285,83 @@
   .round-jump-to-guess {
     display: grid;
     padding: .65rem;
+  }
+}
+
+.round-revealed-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  list-style: none;
+  padding: 0;
+  margin: .65rem 0 0;
+}
+
+.round-revealed-hints li {
+  padding: .45rem .65rem;
+  border: 1px solid var(--site-border);
+  border-radius: .5rem;
+  background: var(--site-surface);
+  color: var(--site-muted);
+  font-size: .875rem;
+}
+
+.round-revealed-hints strong {
+  margin-left: .2rem;
+  color: var(--site-ink);
+}
+
+.round-expand-map {
+  display: none;
+  position: absolute;
+  top: .65rem;
+  right: .65rem;
+  z-index: 3;
+  width: 2.8rem;
+  padding: 0;
+}
+
+.round-map-fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: var(--site-surface);
+  color: var(--site-ink);
+}
+
+.round-map-fullscreen[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.round-map-fullscreen .round-panel-heading {
+  align-items: center;
+  padding-top: max(.75rem, env(safe-area-inset-top));
+}
+
+.round-map-fullscreen .round-map {
+  min-height: 0;
+}
+
+.round-map-fullscreen .round-clue-views,
+.round-map-fullscreen .round-confirm {
+  padding-bottom: max(.65rem, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 700px) {
+  .round-expand-map {
+    display: inline-flex;
+  }
+
+  .round-guess-map .maplibregl-ctrl-top-right {
+    top: 3rem;
   }
 }

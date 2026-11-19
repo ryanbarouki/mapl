@@ -2,7 +2,7 @@
   padding: clamp(1rem, 3vw, 2.5rem) var(--site-gutter);
 }
 
-.round-header, .round-status, .round-board {
+.round-header, .round-status {
   max-width: var(--site-width);
   margin-inline: auto;
 }
@@ -69,37 +69,151 @@
   color: var(--site-accent);
 }
 
-.round-board {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1rem;
+.site-shell:has(> .round-active) {
+  height: 100vh;
+  height: 100dvh;
 }
 
-.round-panel {
+.round-active {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  gap: .55rem;
+  padding: .65rem max(.75rem, env(safe-area-inset-right))
+    max(.6rem, env(safe-area-inset-bottom)) max(.75rem, env(safe-area-inset-left));
+}
+
+.round-hud {
+  display: grid;
+  gap: .55rem;
+}
+
+.round-active .round-header, .round-active .round-status {
+  width: 100%;
+}
+
+.round-active .round-status {
+  margin-block: 0;
+}
+
+.round-active .round-header {
+  gap: .6rem;
+}
+
+.round-active h1 {
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
+}
+
+.round-active .round-mode {
+  margin-bottom: .15rem;
+}
+
+.round-board {
+  --map-dock-height: 4.35rem;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  flex: 1;
+  width: 100%;
+  max-width: var(--site-width);
+  min-height: 20rem;
+  margin-inline: auto;
+}
+
+.round-map-view {
+  position: relative;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   border: 1px solid var(--site-border);
   border-radius: var(--site-radius);
-  overflow: hidden;
   background: var(--site-surface);
 }
 
-.round-panel-heading {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: .35rem .75rem;
-  padding: .75rem 1rem;
+.round-map-view[data-active='false'] {
+  position: absolute;
+  z-index: 3;
+  right: var(--map-edge-right);
+  bottom: var(--map-edge-bottom);
+  width: var(--map-preview-width);
+  aspect-ratio: 4 / 3;
+  border: 2px solid var(--site-surface);
+  border-radius: .7rem;
+  box-shadow: 0 .2rem .75rem #29251c55;
 }
 
-.round-panel-heading h2 {
+.round-map-view[data-active='false'] .round-map {
+  pointer-events: none;
+}
+
+.round-map-view[data-active='false'] :is(.maplibregl-ctrl-group, .maplibregl-ctrl-scale, .maplibregl-ctrl-attrib-inner) {
+  visibility: hidden;
+}
+
+.round-map-switch {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  padding: .3rem;
+  border: 0;
+  background: transparent;
+  color: var(--site-ink);
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 750;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.round-map-switch span {
+  padding: .3rem .45rem;
+  border-radius: .35rem;
+  background: var(--site-yellow);
+}
+
+.round-map-switch:is(:hover, :focus-visible) {
+  outline: 2px solid var(--site-accent);
+  outline-offset: -2px;
+}
+
+.round-map-dock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .55rem;
+  flex: 0 0 var(--map-dock-height);
+  min-width: 0;
+  padding: .45rem .75rem;
+  border-top: 1px solid var(--site-border);
+}
+
+.round-map-caption {
+  min-width: 0;
+}
+
+.round-map-caption h2 {
   font-size: 1rem;
 }
 
-.round-panel-heading span, .round-detail {
+.round-map-caption p, .round-detail {
   color: var(--site-muted);
   font-size: .875rem;
+}
+
+.round-clue-views {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.round-map-dock .site-button {
+  flex: none;
+  white-space: nowrap;
 }
 
 .round-map, .round-result-map {
@@ -110,7 +224,7 @@
 
 .round-map {
   flex: 1;
-  min-height: clamp(19rem, 52svh, 48rem);
+  min-height: 0;
 }
 
 .round-map > div {
@@ -121,14 +235,6 @@
 .round-result-map {
   border-radius: .75rem;
   height: clamp(15rem, 52svh, 31rem);
-}
-
-.round-confirm {
-  padding: .65rem;
-}
-
-.round-confirm .site-button {
-  width: 100%;
 }
 
 .round-pin-label {
@@ -193,21 +299,6 @@
   padding: .65rem;
 }
 
-@media (max-width: 700px) {
-  .round-board {
-    grid-template-columns: 1fr;
-  }
-
-  .round-map {
-    min-height: clamp(12rem, 30svh, 22rem);
-  }
-
-  .round-attempts li {
-    display: grid;
-    padding: .55rem;
-  }
-}
-
 .round-hint {
   display: grid;
   gap: .35rem;
@@ -261,31 +352,9 @@
   margin-top: .45rem;
 }
 
-.round-clue-views {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .4rem;
-  padding: .65rem;
-}
-
-.round-clue-views .site-button {
-  flex: 1;
-}
-
-.round-clue-views .site-button[aria-pressed="true"] {
+.round-clue-views .site-button[aria-pressed='true'] {
   background: var(--site-yellow-tint);
   border-color: var(--site-accent);
-}
-
-.round-jump-to-guess {
-  display: none;
-}
-
-@media (max-width: 700px) {
-  .round-jump-to-guess {
-    display: grid;
-    padding: .65rem;
-  }
 }
 
 .round-revealed-hints {
@@ -311,57 +380,110 @@
   color: var(--site-ink);
 }
 
-.round-expand-map {
-  display: none;
-  position: absolute;
-  top: .65rem;
-  right: .65rem;
-  z-index: 3;
-  width: 2.8rem;
-  padding: 0;
-}
-
-.round-map-fullscreen {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  max-width: none;
-  height: 100vh;
-  height: 100dvh;
-  max-height: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
-  background: var(--site-surface);
-  color: var(--site-ink);
-}
-
-.round-map-fullscreen[open] {
-  display: flex;
-  flex-direction: column;
-}
-
-.round-map-fullscreen .round-panel-heading {
-  align-items: center;
-  padding-top: max(.75rem, env(safe-area-inset-top));
-}
-
-.round-map-fullscreen .round-map {
-  min-height: 0;
-}
-
-.round-map-fullscreen .round-clue-views,
-.round-map-fullscreen .round-confirm {
-  padding-bottom: max(.65rem, env(safe-area-inset-bottom));
-}
-
 @media (max-width: 700px) {
-  .round-expand-map {
-    display: inline-flex;
+  .round-active {
+    padding: .5rem 0 0;
   }
 
-  .round-guess-map .maplibregl-ctrl-top-right {
-    top: 3rem;
+  .round-active .round-hud {
+    gap: .35rem;
+    padding-inline: max(.55rem, env(safe-area-inset-left)) max(.55rem, env(safe-area-inset-right));
+  }
+
+  .round-active :is(h1, .round-mode, .round-map-caption h2, .round-map-view[aria-label='Clue map'] .round-map-caption) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .round-active .round-header {
+    gap: .2rem;
+  }
+
+  .round-active .round-hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .15rem .45rem;
+  }
+
+  .round-active .round-header .site-button {
+    min-height: 2rem;
+    padding: .2rem .4rem;
+    font-size: .82rem;
+  }
+
+  .round-active .round-hint span,
+  .round-active .round-attempts li,
+  .round-active .round-revealed-hints li {
+    font-size: .75rem;
+  }
+
+  .round-active .round-attempts {
+    gap: .2rem;
+  }
+
+  .round-active .round-attempts li {
+    min-height: 0;
+    padding: .15rem .3rem;
+  }
+
+  .round-active .round-revealed-hints {
+    gap: .2rem;
+    margin-top: .25rem;
+  }
+
+  .round-active .round-revealed-hints li {
+    padding: .15rem .3rem;
+  }
+
+  .round-board {
+    --map-edge-left: max(.5rem, env(safe-area-inset-left));
+    --map-edge-right: max(.5rem, env(safe-area-inset-right));
+    --map-edge-bottom: calc(.5rem + max(1.5rem, env(safe-area-inset-bottom)));
+    --map-preview-width: clamp(6.2rem, 28vw, 12rem);
+    display: block;
+    min-height: 18rem;
+    max-width: none;
+  }
+
+  .round-map-view[data-active='true'] {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .round-map-dock {
+    position: absolute;
+    z-index: 3;
+    left: var(--map-edge-left);
+    bottom: var(--map-edge-bottom);
+    flex-wrap: wrap;
+    width: max-content;
+    max-width: calc(100% - var(--map-preview-width) - var(--map-edge-right) - var(--map-edge-left) - .5rem);
+    padding: .35rem;
+    border: 1px solid var(--site-border);
+    border-radius: .65rem;
+    background: var(--site-surface);
+  }
+
+  .round-map-dock .site-button {
+    min-height: 2.5rem;
+    padding: .3rem .4rem;
+    font-size: .82rem;
+  }
+
+  .round-clue-views {
+    flex-wrap: wrap;
+    gap: .2rem;
+  }
+
+  .round-map-view[aria-label='Clue map'] .round-map-dock:not(:has(.round-clue-views)) {
+    padding: 0;
+    border: 0;
   }
 }

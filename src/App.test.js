@@ -43,9 +43,16 @@ let originalClipboard;
 let writeText;
 let originalMapEnv;
 let originalGtag;
+let originalMatchMedia;
 
 beforeEach(() => {
   originalFetch = global.fetch;
+  originalMatchMedia = window.matchMedia;
+  window.matchMedia = jest.fn().mockReturnValue({
+    matches: true,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  });
   originalGtag = window.gtag;
   window.gtag = jest.fn();
   originalMapEnv = process.env;
@@ -66,6 +73,7 @@ beforeEach(() => {
 
 afterEach(() => {
   global.fetch = originalFetch;
+  window.matchMedia = originalMatchMedia;
   window.gtag = originalGtag;
   process.env = originalMapEnv;
   if (originalClipboard) Object.defineProperty(navigator, 'clipboard', originalClipboard);
@@ -76,8 +84,13 @@ function openGame(path) {
   return render(<MemoryRouter initialEntries={[path]}><App /></MemoryRouter>);
 }
 
+async function focusGuessMap() {
+  fireEvent.click(await screen.findByRole('button', { name: 'Switch to guess map' }));
+}
+
 async function guess(pin) {
-  fireEvent.click(await screen.findByRole('button', { name: pin }));
+  if (!screen.queryByRole('button', { name: pin })) await focusGuessMap();
+  fireEvent.click(screen.getByRole('button', { name: pin }));
   fireEvent.click(screen.getByRole('button', { name: 'Confirm guess' }));
 }
 
@@ -86,6 +99,7 @@ test('random mode shows distance after a miss and shares a spoiler-free result',
   expect(await screen.findByLabelText('MapTiler map')).toBeInTheDocument();
   expect(screen.queryByLabelText('Apple map')).toBeNull();
   await guess('Pin a distant guess');
+  fireEvent.click(screen.getByRole('button', { name: 'Switch to clue map' }));
   expect(screen.getByText('Zoomed out after your guess')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' }));
   expect(screen.getByRole('button', { name: 'Reveal border or region (1/4 used)' })).toBeEnabled();
@@ -102,7 +116,8 @@ test('random mode shows distance after a miss and shares a spoiler-free result',
   expect(text).not.toContain('Test City');
 
   fireEvent.click(screen.getByRole('button', { name: 'Play again' }));
-  expect(await screen.findByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
+  await focusGuessMap();
+  expect(screen.getByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
   expect(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' })).toBeEnabled();
 });
 
@@ -126,7 +141,8 @@ test('a saved early Daily win reopens as complete and offers manual copying', as
 test('an allowed host uses Apple Maps and can switch providers', async () => {
   process.env.REACT_APP_MAPKIT_JWT = `header.${btoa(JSON.stringify({ origin: 'localhost' }))}.signature`;
   openGame('/play');
-  expect(await screen.findByLabelText('Apple map')).toBeInTheDocument();
+  await focusGuessMap();
+  expect(screen.getByLabelText('Apple map')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Use MapTiler' }));
   expect(screen.getByLabelText('MapTiler map')).toBeInTheDocument();
 });
@@ -134,7 +150,8 @@ test('an allowed host uses Apple Maps and can switch providers', async () => {
 test('the provider switch disappears once Apple Maps loads', async () => {
   process.env.REACT_APP_MAPKIT_JWT = `header.${btoa(JSON.stringify({ origin: 'localhost' }))}.signature`;
   openGame('/play');
-  expect(await screen.findByRole('button', { name: 'Use MapTiler' })).toBeInTheDocument();
+  await focusGuessMap();
+  expect(screen.getByRole('button', { name: 'Use MapTiler' })).toBeInTheDocument();
 
   act(() => mockAppleMapOnLoad());
   expect(screen.getByLabelText('Apple map')).toBeInTheDocument();
@@ -219,7 +236,8 @@ test('Random challenge links reopen the same location and replay clears the chal
   expect(writeText.mock.calls[0][0]).not.toContain('Test City');
 
   fireEvent.click(screen.getByRole('button', { name: 'Play again' }));
-  expect(await screen.findByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
+  await focusGuessMap();
+  expect(screen.getByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
   expect(screen.queryByText(/friend’s score/i)).not.toBeInTheDocument();
 });
 
@@ -229,6 +247,7 @@ test('clue zoom can revisit unlocked views and advances after each guess', async
   expect(screen.queryByRole('group', { name: 'Clue map zoom' })).not.toBeInTheDocument();
 
   await guess('Pin a distant guess');
+  fireEvent.click(screen.getByRole('button', { name: 'Switch to clue map' }));
   expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('10');
   expect(screen.queryByRole('button', { name: 'View 3' })).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'View 1' }));
@@ -237,6 +256,7 @@ test('clue zoom can revisit unlocked views and advances after each guess', async
   expect(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' })).toBeEnabled();
 
   await guess('Pin a distant guess');
+  fireEvent.click(screen.getByRole('button', { name: 'Switch to clue map' }));
   expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('7');
   fireEvent.click(screen.getByRole('button', { name: 'View 2' }));
   expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('10');
@@ -246,7 +266,9 @@ test('clue zoom can revisit unlocked views and advances after each guess', async
 
 test('players can jump to the guess map and get instructions after placing a pin', async () => {
   openGame('/play');
-  fireEvent.click(await screen.findByRole('button', { name: 'Make a guess' }));
+  expect(await screen.findByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
+  await focusGuessMap();
+  expect(screen.queryByRole('button', { name: 'Make a guess' })).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Your guess' })).toHaveFocus();
   expect(screen.getByText('Tap or click the map to place a pin.')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Pin a distant guess' }));
@@ -285,6 +307,7 @@ test('the Random menu link starts a fresh round from an active Random game', asy
   fireEvent.click(screen.getByRole('link', { name: 'Random' }));
   expect(await screen.findByLabelText('Clue zoom')).toHaveTextContent('13');
   expect(screen.getByRole('button', { name: 'Reveal continent (0/4 used)' })).toBeEnabled();
+  await focusGuessMap();
   expect(screen.getByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
   expect(global.fetch).toHaveBeenCalledTimes(2);
 });
@@ -342,29 +365,29 @@ test('an older Daily save keeps its old hint cost when it buys a new hint', asyn
   expect(JSON.parse(localStorage.getItem('hints'))[day]).toEqual({ count: 3, penalty: 1400 });
 });
 
-test('the full-screen clue map shares zoom controls and returns to the pending guess', async () => {
+test('the map preview switches views while preserving the pending pin and clue zoom', async () => {
   openGame('/play');
+  const clue = await screen.findByLabelText('Clue zoom');
+  const guessMap = screen.getByLabelText('MapTiler map');
+  expect(screen.getByRole('region', { name: 'Clue map' })).toHaveAttribute('data-active', 'true');
+  expect(screen.queryByRole('button', { name: 'Pin the target' })).not.toBeInTheDocument();
+
   await guess('Pin a distant guess');
-  fireEvent.click(screen.getByRole('button', { name: 'Pin the target' }));
+  expect(screen.getByRole('region', { name: 'Guess map' })).toHaveAttribute('data-active', 'true');
+  fireEvent.click(within(guessMap).getByRole('button', { name: 'Pin the target' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Switch to clue map' }));
 
-  const dialog = document.getElementById('clue-fullscreen');
-  dialog.showModal = () => { dialog.open = true; };
-  dialog.close = () => {
-    dialog.open = false;
-    fireEvent(dialog, new Event('close'));
-  };
-  fireEvent.click(screen.getByRole('button', { name: 'Full screen' }));
+  expect(screen.getByRole('heading', { name: 'Clue map' })).toHaveFocus();
+  expect(clue).toHaveTextContent('10');
+  fireEvent.click(screen.getByRole('button', { name: 'View 1' }));
+  await focusGuessMap();
 
-  const expanded = within(screen.getByRole('dialog', { name: 'Clue map' }));
-  expect(expanded.getByLabelText('Clue zoom')).toHaveTextContent('10');
-  fireEvent.click(expanded.getByRole('button', { name: 'View 1' }));
-  expect(expanded.getByLabelText('Clue zoom')).toHaveTextContent('13');
-  fireEvent.click(expanded.getByRole('button', { name: 'Back to guess' }));
-
-  expect(screen.queryByRole('dialog', { name: 'Clue map' })).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Your guess' })).toHaveFocus();
-  expect(screen.getByLabelText('Clue zoom')).toHaveTextContent('13');
-  expect(screen.getByRole('button', { name: 'Confirm guess' })).toBeEnabled();
+  expect(screen.getByLabelText('MapTiler map')).toBe(guessMap);
+  expect(screen.getByLabelText('Clue zoom')).toBe(clue);
+  expect(clue).toHaveTextContent('13');
+  fireEvent.click(screen.getByRole('button', { name: 'Confirm guess' }));
+  expect(screen.getByRole('heading', { name: 'Test City, Test Country' })).toBeInTheDocument();
 });
 
 test('hint prices drop after each guess and only the price paid is deducted', async () => {
@@ -383,32 +406,18 @@ test('hint prices drop after each guess and only the price paid is deducted', as
   expect(screen.getByText('7,400')).toBeInTheDocument();
 });
 
-test('the full-screen guess map keeps the same map and lets players confirm a pin', async () => {
+test('desktop shows the clue and guessing maps together', async () => {
+  window.matchMedia.mockReturnValue({
+    matches: false,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  });
   openGame('/play');
-  const map = await screen.findByLabelText('MapTiler map');
-  fireEvent.click(within(map).getByRole('button', { name: 'Pin a distant guess' }));
 
-  const dialog = document.getElementById('guess-fullscreen');
-  dialog.showModal = () => { dialog.open = true; };
-  dialog.close = () => {
-    dialog.open = false;
-    fireEvent(dialog, new Event('close'));
-  };
-  fireEvent.click(screen.getByRole('button', { name: 'Full screen guess map' }));
-
-  const expanded = within(screen.getByRole('dialog', { name: 'Guess map' }));
-  expect(expanded.getByLabelText('MapTiler map')).toBe(map);
-  expect(expanded.getByRole('button', { name: 'Confirm guess' })).toBeEnabled();
-  fireEvent.click(expanded.getByRole('button', { name: 'Close full screen' }));
-  expect(screen.getByLabelText('MapTiler map')).toBe(map);
-  expect(screen.getByRole('button', { name: 'Confirm guess' })).toBeEnabled();
-
-  fireEvent.click(screen.getByRole('button', { name: 'Full screen guess map' }));
-  fireEvent.click(expanded.getByRole('button', { name: 'Confirm guess' }));
-  expect(screen.getByRole('dialog', { name: 'Guess map' })).toBeInTheDocument();
-  expect(expanded.getByRole('button', { name: 'Place a pin to guess' })).toBeDisabled();
-  fireEvent.click(expanded.getByRole('button', { name: 'Pin the target' }));
-  fireEvent.click(expanded.getByRole('button', { name: 'Confirm guess' }));
-  expect(screen.getByRole('heading', { name: 'Test City, Test Country' })).toBeInTheDocument();
-  expect(screen.queryByRole('dialog', { name: 'Guess map' })).not.toBeInTheDocument();
+  const clue = await screen.findByRole('region', { name: 'Clue map' });
+  const guessMap = screen.getByRole('region', { name: 'Guess map' });
+  expect(clue).toHaveAttribute('data-active', 'true');
+  expect(guessMap).toHaveAttribute('data-active', 'true');
+  expect(screen.queryByRole('button', { name: 'Switch to guess map' })).not.toBeInTheDocument();
+  expect(within(guessMap).getByRole('button', { name: 'Pin the target' })).toBeEnabled();
 });

@@ -4,8 +4,8 @@ import { DateTime } from 'luxon';
 import Papa from 'papaparse';
 import seedrandom from 'seedrandom';
 import { Link } from 'react-router-dom';
-import { HiArrowsPointingOut } from 'react-icons/hi2';
 import ViewMap from './Map';
+import RoundMapView from './RoundMapView';
 import GuessMap from './GuessMapApple';
 import ResultMap, { formatDistance } from './AppleMap';
 import { Share } from './Share';
@@ -14,6 +14,7 @@ import { trackChallengeOpen, trackChallengeGuess, trackChallengeComplete } from 
 import { MAX_GUESSES, MAX_SCORE, WIN_RADIUS, isRoundComplete } from '../roundRules';
 import './Play.css';
 
+const MOBILE_MAP_QUERY = '(max-width: 700px)';
 const REDACTED_MAP = 'e88d9cf7-c88c-40cb-9510-bb1f7a29c306';
 const LABELED_MAP = '6b3f0bd3-eea3-4016-8e88-77937de021ca';
 const LEGACY_HINT_COST = 200;
@@ -76,9 +77,8 @@ export default function Play({ guesses, addGuess, hintState, setHintState, seed,
   const [loadError, setLoadError] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [showMap, setShowMap] = useState(false);
-  const guessHeading = useRef(null);
-  const clueDialog = useRef(null);
-  const [clueExpanded, setClueExpanded] = useState(false);
+  const [guessFocused, setGuessFocused] = useState(false);
+  const [mobile, setMobile] = useState(() => window.matchMedia?.(MOBILE_MAP_QUERY).matches ?? false);
   const challengeOpened = useRef(false);
   const challengeGuessLogged = useRef(false);
   const [selectedClueView, setSelectedClueView] = useState(null);
@@ -91,6 +91,8 @@ export default function Play({ guesses, addGuess, hintState, setHintState, seed,
   const nextHintCost = nextHint ? Math.round(nextHint.cost * hintPriceMultiplier) : 0;
   const namesRevealed = hints >= HINTS.length;
   const clueView = selectedClueView ?? guesses.length;
+  const clueCaption = clueView < guesses.length ? 'Reviewing an earlier clue view' :
+    guesses.length ? 'Zoomed out after your guess' : undefined;
   const analyticsMode = daily ? 'daily' : 'random';
   const closestDistance = Math.min(...guesses.map(guess => guess.distance));
   const won = closestDistance <= WIN_RADIUS;
@@ -100,6 +102,14 @@ export default function Play({ guesses, addGuess, hintState, setHintState, seed,
     (MAX_SCORE - 1000 * (guesses.length - 1) - hintPenalty) *
     Math.exp(-closestDistance / 2000000)
   );
+
+  useEffect(() => {
+    const query = window.matchMedia?.(MOBILE_MAP_QUERY);
+    if (!query) return;
+    const onChange = event => setMobile(event.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -138,41 +148,8 @@ export default function Play({ guesses, addGuess, hintState, setHintState, seed,
     setSelectedClueView(null);
   }
 
-  function renderClueMap(fullscreen = false) {
-    const showClue = fullscreen || !clueExpanded;
-    return (
-      <>
-        <div className="round-map">
-          {showClue && (
-            <ViewMap zoom={CLUE_VIEWS[clueView].zoom} latitude={answer.latitude} longitude={answer.longitude}
-              map={namesRevealed ? LABELED_MAP : REDACTED_MAP} />
-          )}
-          {!fullscreen && (
-            <button className="site-button site-button-secondary round-expand-map"
-              aria-label="Full screen" aria-haspopup="dialog" aria-controls="clue-fullscreen" onClick={() => {
-                clueDialog.current.showModal();
-                setClueExpanded(true);
-              }}>
-              <HiArrowsPointingOut size={20} aria-hidden="true" />
-            </button>
-          )}
-        </div>
-        {showClue && guesses.length > 0 && (
-          <div className="round-clue-views" role="group" aria-label="Clue map zoom">
-            {CLUE_VIEWS.slice(0, guesses.length + 1).map(({ label }, index) => (
-              <button key={label} className="site-button site-button-secondary"
-                aria-pressed={clueView === index} onClick={() => setSelectedClueView(index)}>
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-      </>
-    );
-  }
-
   return (
-    <main className="round">
+    <main className={answer && !finished ? "round round-active" : "round"}>
       {!answer ? (
         <section className="round-summary" aria-labelledby="loading-title">
           <h1 id="loading-title">{loadError ? 'Couldn’t load the round' : 'Loading the puzzle…'}</h1>
@@ -214,75 +191,61 @@ export default function Play({ guesses, addGuess, hintState, setHintState, seed,
         </section>
       ) : (
         <>
-          <header className="round-header">
-            <div>
-              <p className="round-mode">{mode}</p>
-              <h1>Where on Earth is this?!</h1>
-              {targetScore !== null && <p className="round-challenge">Friend’s score to beat <strong>{targetScore.toLocaleString()}</strong></p>}
+          <div className="round-hud">
+            <header className="round-header">
+              <div>
+                <p className="round-mode">{mode}</p>
+                <h1>Where on Earth is this?!</h1>
+                {targetScore !== null && <p className="round-challenge">Friend’s score to beat <strong>{targetScore.toLocaleString()}</strong></p>}
+              </div>
+              <div className="round-hint">
+                <button className="site-button site-button-secondary" disabled={namesRevealed}
+                  onClick={() => setHintState({ count: hints + 1, penalty: hintPenalty + nextHintCost })}
+                  aria-describedby="hint-cost">
+                  {nextHint?.label ?? 'All hints revealed'} ({hints}/{HINTS.length} used)
+                </button>
+                <span id="hint-cost">
+                  {nextHint ? `Costs ${nextHintCost.toLocaleString()} points` :
+                    `${hintPenalty.toLocaleString()} base points spent on hints`}
+                </span>
+              </div>
+            </header>
+            <div className="round-status" aria-live="polite">
+              <AttemptList guesses={guesses} />
+              {hints > 0 && (
+                <ul className="round-revealed-hints" aria-label="Revealed hints">
+                  <li>Continent <strong>{answer.continent ?? 'Unavailable'}</strong></li>
+                  {hints >= 2 && (
+                    <li>
+                      {answer.neighbor ? 'Bordering country' : 'Region'}{' '}
+                      <strong>{answer.neighbor ?? answer.region ?? 'Unavailable'}</strong>
+                    </li>
+                  )}
+                  {hints >= 3 && <li>Country <strong>{answer.country}</strong></li>}
+                  {namesRevealed && <li>Place names are visible on the clue map</li>}
+                </ul>
+              )}
             </div>
-            <div className="round-hint">
-              <button className="site-button site-button-secondary" disabled={namesRevealed}
-                onClick={() => setHintState({ count: hints + 1, penalty: hintPenalty + nextHintCost })}
-                aria-describedby="hint-cost">
-                {nextHint?.label ?? 'All hints revealed'} ({hints}/{HINTS.length} used)
-              </button>
-              <span id="hint-cost">
-                {nextHint ? `Costs ${nextHintCost.toLocaleString()} points` :
-                  `${hintPenalty.toLocaleString()} base points spent on hints`}
-              </span>
-            </div>
-          </header>
-          <div className="round-status" aria-live="polite">
-            <AttemptList guesses={guesses} />
-            {hints > 0 && (
-              <ul className="round-revealed-hints" aria-label="Revealed hints">
-                <li>Continent <strong>{answer.continent ?? 'Unavailable'}</strong></li>
-                {hints >= 2 && (
-                  <li>
-                    {answer.neighbor ? 'Bordering country' : 'Region'}{' '}
-                    <strong>{answer.neighbor ?? answer.region ?? 'Unavailable'}</strong>
-                  </li>
-                )}
-                {hints >= 3 && <li>Country <strong>{answer.country}</strong></li>}
-                {namesRevealed && <li>Place names are visible on the clue map</li>}
-              </ul>
-            )}
           </div>
           <div className="round-board">
-            <section className="round-panel" aria-labelledby="clue-title">
-              <div className="round-panel-heading">
-                <h2 id="clue-title">Clue map</h2>
-                <span>{clueView < guesses.length ? 'Reviewing an earlier clue view' :
-                  guesses.length ? 'Zoomed out after your guess' : 'Look for roads, rivers and coastlines'}</span>
-              </div>
-              {renderClueMap()}
-              <div className="round-jump-to-guess">
-                <button className="site-button" onClick={() => guessHeading.current.focus()}>
-                  Make a guess
-                </button>
-              </div>
-            </section>
-            <section className="round-panel" aria-labelledby="guess-title">
-              <GuessMap handleGuess={submitGuess} guesses={guesses} headingRef={guessHeading} />
-            </section>
-          </div>
-          <dialog id="clue-fullscreen" className="round-map-fullscreen" ref={clueDialog}
-            aria-labelledby="clue-fullscreen-title" onClose={() => setClueExpanded(false)}>
-            {clueExpanded && (
-              <>
-                <div className="round-panel-heading">
-                  <h2 id="clue-fullscreen-title">Clue map</h2>
-                  <button className="site-button" onClick={() => {
-                    clueDialog.current.close();
-                    guessHeading.current.focus();
-                  }}>
-                    Back to guess
-                  </button>
+            <RoundMapView name="Clue map" caption={clueCaption}
+              active={!mobile || !guessFocused} onActivate={() => setGuessFocused(false)}
+              map={<ViewMap zoom={CLUE_VIEWS[clueView].zoom} latitude={answer.latitude} longitude={answer.longitude}
+                map={namesRevealed ? LABELED_MAP : REDACTED_MAP} />}>
+              {guesses.length > 0 && (
+                <div className="round-clue-views" role="group" aria-label="Clue map zoom">
+                  {CLUE_VIEWS.slice(0, guesses.length + 1).map(({ label }, index) => (
+                    <button key={label} className="site-button site-button-secondary"
+                      aria-pressed={clueView === index} onClick={() => setSelectedClueView(index)}>
+                      {label}
+                    </button>
+                  ))}
                 </div>
-                {renderClueMap(true)}
-              </>
-            )}
-          </dialog>
+              )}
+            </RoundMapView>
+            <GuessMap active={!mobile || guessFocused} onActivate={() => setGuessFocused(true)}
+              handleGuess={submitGuess} guesses={guesses} />
+          </div>
         </>
       )}
     </main>

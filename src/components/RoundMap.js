@@ -47,7 +47,7 @@ export default function RoundMap({ pins, onPick, initialRegion, initialViewState
             <Fragment key={id}>
               <AppleMarker latitude={latitude} longitude={longitude} color={color} />
               {label && (
-                <Annotation latitude={latitude} longitude={longitude}>
+                <Annotation latitude={latitude} longitude={longitude} anchorOffsetY={52} enabled={false}>
                   <span className="round-pin-label">{label}</span>
                 </Annotation>
               )}

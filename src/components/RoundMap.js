@@ -54,7 +54,7 @@ export default function RoundMap({ pins, onPick, initialRegion, initialViewState
             </Fragment>
           ))}
         </AppleMap>
-        {mapTilerKey && (
+        {mapTilerKey && !appleLoaded && (
           <button className="round-map-provider" onClick={() => setUseApple(false)}>
             Use MapTiler
           </button>

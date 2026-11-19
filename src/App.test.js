@@ -6,8 +6,12 @@ import App from './App';
 jest.mock('./components/Map', () => ({ zoom, map }) => (
   <output aria-label="Clue zoom" data-map-style={map}>{zoom}</output>
 ));
+let mockAppleMapOnLoad;
 jest.mock('mapkit-react', () => ({
-  Map: () => <div aria-label="Apple map" />,
+  Map: ({ onLoad }) => {
+    mockAppleMapOnLoad = onLoad;
+    return <div aria-label="Apple map" />;
+  },
   Marker: () => null,
   Annotation: () => null,
 }), { virtual: true });
@@ -125,6 +129,16 @@ test('an allowed host uses Apple Maps and can switch providers', async () => {
   expect(await screen.findByLabelText('Apple map')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Use MapTiler' }));
   expect(screen.getByLabelText('MapTiler map')).toBeInTheDocument();
+});
+
+test('the provider switch disappears once Apple Maps loads', async () => {
+  process.env.REACT_APP_MAPKIT_JWT = `header.${btoa(JSON.stringify({ origin: 'localhost' }))}.signature`;
+  openGame('/play');
+  expect(await screen.findByRole('button', { name: 'Use MapTiler' })).toBeInTheDocument();
+
+  act(() => mockAppleMapOnLoad());
+  expect(screen.getByLabelText('Apple map')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Use MapTiler' })).not.toBeInTheDocument();
 });
 
 test('home makes today’s puzzle the primary action and reflects saved progress', () => {

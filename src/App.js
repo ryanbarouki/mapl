@@ -1,108 +1,35 @@
-import styled, { css } from 'styled-components';
-import { Main } from './components/Main';
-import maplLogo from './mapl_logo.svg';
-import { Link } from 'react-router-dom';
-import LeaderboardIcon from '@mui/icons-material/Leaderboard';
-import HomeIcon from '@mui/icons-material/Home';
-import InfoIcon from '@mui/icons-material/Info';
-import HowToPlay from './components/HowToPlay';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { HomeRoute } from './components/HomeRoute';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Main } from './components/Main';
+import HowToPlay from './components/HowToPlay';
+import Home from './components/Home';
+import Footer from './components/Footer';
 
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  bottom: 0;
-`;
-
-const Logo = styled.img`
-  height: 3rem;
-  pointer-events: none;
-`;
-
-const IconStyle = css`
-  color: var(--primary-highlight);
-  margin-top: 10px;
-`;
-
-const Home = styled(HomeIcon)`
-  ${IconStyle}
-`;
-
-const Stats = styled(LeaderboardIcon)`
-  ${IconStyle}
-`;
-
-const Info = styled(InfoIcon)`
-  ${IconStyle}
-`;
-
-const IconContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  align-items: center;
-`;
-
-const Bar = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  height: 70px;
-  gap: 1rem;
-`;
-
-const NavItem = styled.div`
-  text-align: center;
-  cursor: pointer;
-  font-family: BRShape;
-  color: black;
-  &:hover {
-    color: var(--primary-highlight);
-  }
-`;
-
-function App() {
+export default function App() {
   const [openHowTo, setOpenHowTo] = useState(false);
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   return (
-    <Container>
-      <HomeRoute />
-      {location.pathname !== "/" &&
-        <>
-          <HowToPlay isOpen={openHowTo}
-            onClose={() => setOpenHowTo(false)}
-          />
-          <Bar>
-            <Link to="/" style={{ textDecoration: "none" }}>
-              <Logo src={maplLogo} />
-            </Link>
-            <IconContainer>
-              <Link to="/play" style={{ textDecoration: "none" }}>
-                <NavItem>
-                  Play
-                </NavItem>
-              </Link>
-              <Link to="/about" style={{ textDecoration: "none" }}>
-                <NavItem>
-                  About
-                </NavItem>
-              </Link>
-              <NavItem onClick={() => setOpenHowTo(true)}>How to Play</NavItem>
-            </IconContainer>
-          </Bar>
-          <Main></Main>
-        </>
-      }
-    </Container>
+    <div className="site-shell">
+      <header className="site-header">
+        <div className="site-header-inner">
+          <Link to="/" aria-label="Mapl / Where on Earth?! home" className="mapl-wordmark">
+            <span className="mapl-logo-tile" aria-hidden="true"><span /></span>
+            <span className="mapl-logo-text">
+              Mapl <span className="mapl-logo-subtitle">/ Where on Earth?!</span>
+            </span>
+          </Link>
+          <nav className="site-nav" aria-label="Main navigation">
+            <NavLink to="/daily">Daily</NavLink>
+            <NavLink to="/play">Random</NavLink>
+            <NavLink to="/about">About</NavLink>
+            <button onClick={() => setOpenHowTo(true)}>How to play</button>
+          </nav>
+        </div>
+      </header>
+      <HowToPlay isOpen={openHowTo} onClose={() => setOpenHowTo(false)} />
+      {pathname === '/' ? <Home /> : <Main />}
+      {!['/daily', '/play'].includes(pathname) && <Footer />}
+    </div>
   );
 }
-
-export default App;

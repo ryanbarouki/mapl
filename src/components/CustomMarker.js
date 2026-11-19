@@ -1,5 +1,5 @@
 import React from 'react';
-import { Marker } from 'react-map-gl';
+import { Marker } from 'react-map-gl/maplibre';
 import styled from 'styled-components';
 import { HiMapPin } from 'react-icons/hi2';
 
@@ -16,7 +16,6 @@ const MarkerText = styled.div`
   opacity: 0.8;
   border-radius: 3px;
   padding: 5px;
-  font-family: BRShape;
 `;
 
 const Icon = styled(HiMapPin)`

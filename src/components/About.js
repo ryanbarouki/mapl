@@ -1,15 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const Container = styled.div`
-  padding: 2rem;
-  font-family: BRShape;
-`;
 
 function About() {
   return (
-    <Container>
-      <h2>About Mapl</h2>
+    <main className="site-article site-width">
+      <h1>About Mapl</h1>
       <p>I'm a PhD student who likes to make web games!</p>
       <p>Mapl was inspired by <a href='https://www.geoguessr.com/'>geoguessr</a>, <a href="https://timeguessr.com/">timeguessr</a> and a picture frame of a redacted map of Hadrian's wall
         my friend passed around at a party.</p>
@@ -21,7 +15,7 @@ function About() {
           src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' border='0'
           alt='Buy Me a Coffee at ko-fi.com' />
       </a>
-    </Container>
+    </main>
   );
 }
 

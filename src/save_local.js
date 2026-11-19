@@ -13,12 +13,3 @@ export function save(dayString, key, to_save) {
     })
   );
 }
-
-export function saveValue(dayString, key, value) {
-  localStorage.setItem(
-    key,
-    JSON.stringify({
-      [dayString]: value,
-    })
-  );
-}

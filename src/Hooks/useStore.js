@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { loadAll, save, saveValue } from "../save_local";
+import { loadAll, save } from "../save_local";
 
 function initializeEmptyValue(type) {
   switch (type) {
@@ -27,7 +27,7 @@ export function useStore(key, dayString, type) {
 
   const addItem = useCallback(newValue => {
     setItem(newValue);
-    saveValue(dayString, key, newValue);
+    save(dayString, key, newValue);
   },
     [dayString, key]
   );

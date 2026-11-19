@@ -3,7 +3,7 @@ import * as maptilersdk from '@maptiler/sdk';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import styled from 'styled-components';
 import { Button } from '../globalStyles';
-import Map, { Marker, Popup } from 'react-map-gl';
+import Map, { Marker, Popup } from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { HiMapPin } from "react-icons/hi2";

@@ -1,60 +1,34 @@
-import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
-import { Button } from '../globalStyles';
-import { Annotation, Map, Marker, CoordinateRegion } from 'mapkit-react';
+import RoundMap from './RoundMap';
 
 export function formatDistance(distance) {
-  return `${(distance / 1000).toFixed(1)}km`;
+  return `${(distance / 1000).toLocaleString(undefined, { maximumFractionDigits: 1 })} km`;
 }
 
-const Dist = styled.div`
-  text-align: center;
-  font-size: 20px;
-  margin-top: 40px;
-  background-color: white;
-  opacity: 0.8;
-  border-radius: 3px;
-  padding: 5px;
-  font-family: BRShape;
-`;
+export default function ResultMap({ guesses, answer, name }) {
+  const { latitude, longitude } = answer;
+  const latitudeOffset = Math.max(...guesses.map(guess => Math.abs(guess.latitude - latitude)));
+  const longitudeOffset = Math.max(...guesses.map(guess => {
+    const difference = Math.abs(guess.longitude - longitude);
+    return Math.min(difference, 360 - difference);
+  }));
+  const pins = guesses.map((guess, index) => ({
+    ...guess,
+    id: index,
+    color: '#FFCB00',
+    label: `Guess ${index + 1} · ${formatDistance(guess.distance)}`,
+  }));
+  pins.push({ latitude, longitude, id: 'answer', color: '#ff173a', label: name });
 
-export default function BareAppleMap({ guesses, answer, name }) {
-  const [mapInstance, setMapInstance] = useState(null);
   return (
-    <Map
-      token={process.env.REACT_APP_MAPKIT_JWT}
-      ref={setMapInstance}
-      style={{ width: '100%', height: '100%' }}
-      isZoomEnabled={true}
-      isScrollEnabled={true}
-      allowWheelToZoom={true}
-      initialRegion={{ centerLatitude: answer.latitude, centerLongitude: answer.longitude, latitudeDelta: 20, longitudeDelta: 20 }}
-    >
-      {guesses.map((guess, index) => (
-        <>
-          <Marker
-            key={index}
-            latitude={guess.latitude}
-            longitude={guess.longitude}
-            color="#FFCB00"
-          // title={`${formatDistance(guess.distance)}`}
-          />
-          <Annotation latitude={guess.latitude} longitude={guess.longitude}>
-            <Dist>{formatDistance(guess.distance)}</Dist>
-          </Annotation>
-        </>
-      ))}
-      <>
-        <Marker
-          latitude={answer.latitude}
-          longitude={answer.longitude}
-          color="#ff173a"
-        // title={`${formatDistance(guess.distance)}`}
-        />
-        <Annotation latitude={answer.latitude} longitude={answer.longitude}>
-          <Dist>{name}</Dist>
-        </Annotation>
-      </>
-    </Map>
-  )
+    <RoundMap pins={pins} initialRegion={{
+      centerLatitude: latitude,
+      centerLongitude: longitude,
+      latitudeDelta: Math.min(160, Math.max(0.5, latitudeOffset * 2.5)),
+      longitudeDelta: Math.min(360, Math.max(0.5, longitudeOffset * 2.5)),
+    }} initialViewState={{
+      latitude,
+      longitude,
+      zoom: Math.max(0, Math.log2(90 / Math.max(0.5, latitudeOffset, longitudeOffset))),
+    }} />
+  );
 }

@@ -1,14 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const Container = styled.div`
-  padding: 2rem;
-  font-family: BRShape;
-`;
 
 function PrivacyPolicy() {
   return (
-    <Container>
+    <main className="site-article site-width">
       <h1>Privacy Policy for Mapl</h1>
       <p><strong>Last Updated: 16/05/2024</strong></p>
 
@@ -87,7 +81,7 @@ function PrivacyPolicy() {
       </ul>
 
       <p>By using the Service, you acknowledge that you have read and understand this Privacy Policy and agree to be bound by it.</p>
-    </Container>
+    </main>
   );
 }
 

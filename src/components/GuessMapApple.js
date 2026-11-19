@@ -1,101 +1,37 @@
-import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
-import { Button } from '../globalStyles';
-import { Annotation, Map, Marker } from 'mapkit-react';
+import { useState } from 'react';
+import RoundMap from './RoundMap';
 import { formatDistance } from './AppleMap';
 
-const MapWrap = styled.div`
-  position: absolute;
-  // bottom: -40vh;
-  // right: -40vw;
-  bottom: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  height: 30vh;
-  width: 30vw;
-  transition: all 0.3s ease;
-  opacity: 0.5;
-  border: solid;
-  border-width: 2px;
-  border-color: var(--primary-button-unpressed);
-  z-index: 10000;
-  // transition-delay: 1s;
+export default function GuessMap({ handleGuess, guesses, headingRef }) {
+  const [marker, setMarker] = useState(null);
+  const pins = guesses.map((guess, index) => ({
+    ...guess,
+    id: index,
+    color: '#FFCB00',
+    label: formatDistance(guess.distance),
+  }));
+  if (marker) pins.push({ ...marker, id: 'pending', color: '#ff173a' });
 
-  &:hover {
-    opacity: 1;
-    height: 70vh;
-    width: 70vw;
-    // transition-delay: 0s;
+  function confirmGuess() {
+    if (!marker) return;
+    handleGuess(marker);
+    setMarker(null);
   }
-
-  &:active {
-    height: 70vh;
-    width: 70vw;
-    opacity: 1;
-  }
-`;
-
-const Dist = styled.div`
-  text-align: center;
-  font-size: 20px;
-  margin-top: 40px;
-  background-color: white;
-  opacity: 0.8;
-  border-radius: 3px;
-  padding: 5px;
-  font-family: BRShape;
-`;
-
-export default function AppleMap({ handleGuess, guesses, end }) {
-  const [clicked, setClicked] = useState(false);
-  const [marker, setMarker] = useState({ latitude: 0, longitude: 0 });
-  const [mapInstance, setMapInstance] = useState(null);
-
-  const handleClick = (event) => {
-    if (end) return;
-    const { latitude, longitude } = event.toCoordinates();
-
-    setMarker({ longitude: longitude, latitude: latitude });
-    setClicked(true);
-  };
 
   return (
-    <MapWrap>
-      <Map
-        token={process.env.REACT_APP_MAPKIT_JWT}
-        onSingleTap={handleClick}
-        ref={setMapInstance}
-        style={{ width: '100%', height: '100%' }}
-        isZoomEnabled={true}
-        isScrollEnabled={true}
-        allowWheelToZoom={true}
-      >
-        {clicked && (
-          <Marker
-            latitude={marker.latitude}
-            longitude={marker.longitude}
-            color="#ff173a"
-          />
-        )}
-        {guesses.map((guess, index) => (
-          <>
-            <Marker
-              key={index}
-              latitude={guess.latitude}
-              longitude={guess.longitude}
-              color="#FFCB00"
-            // title={`${formatDistance(guess.distance)}`}
-            />
-            <Annotation latitude={guess.latitude} longitude={guess.longitude}>
-              <Dist>{formatDistance(guess.distance)}</Dist>
-            </Annotation>
-          </>
-        ))}
-      </Map>
-      <Button onClick={() => handleGuess(marker, setClicked)} disabled={end || !clicked}>
-        Guess
-      </Button>
-    </MapWrap>
+    <>
+      <div className="round-panel-heading">
+        <h2 id="guess-title" ref={headingRef} tabIndex={-1}>Your guess</h2>
+        <span aria-live="polite">{marker ? 'Move your pin or confirm.' : 'Tap or click the map to place a pin.'}</span>
+      </div>
+      <div className="round-map">
+        <RoundMap pins={pins} onPick={setMarker} />
+      </div>
+      <div className="round-confirm">
+        <button className="site-button" onClick={confirmGuess} disabled={!marker}>
+          {marker ? 'Confirm guess' : 'Place a pin to guess'}
+        </button>
+      </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { DateTime } from 'luxon';
 import App from './App';
+import { getAppleMapToken } from './components/RoundMap';
 
 jest.mock('./components/Map', () => ({ zoom, map }) => (
   <output aria-label="Clue zoom" data-map-style={map}>{zoom}</output>
@@ -420,4 +421,18 @@ test('desktop shows the clue and guessing maps together', async () => {
   expect(guessMap).toHaveAttribute('data-active', 'true');
   expect(screen.queryByRole('button', { name: 'Switch to guess map' })).not.toBeInTheDocument();
   expect(within(guessMap).getByRole('button', { name: 'Pin the target' })).toBeEnabled();
+});
+
+test('Apple Maps picks the token for each site and validates the local override', () => {
+  const token = origin => `header.${btoa(JSON.stringify({ origin }))}.signature`;
+  process.env.REACT_APP_MAPKIT_JWT = token('mapl.life');
+  process.env.REACT_APP_MAPKIT_JWT_WHEREONEARTH = token('whereonearth.world');
+
+  expect(getAppleMapToken('mapl.life')).toBe(process.env.REACT_APP_MAPKIT_JWT);
+  expect(getAppleMapToken('whereonearth.world')).toBe(process.env.REACT_APP_MAPKIT_JWT_WHEREONEARTH);
+  expect(getAppleMapToken('www.whereonearth.world')).toBeUndefined();
+  expect(getAppleMapToken('localhost')).toBeUndefined();
+
+  process.env.REACT_APP_MAPKIT_JWT = token('localhost');
+  expect(getAppleMapToken('localhost')).toBe(process.env.REACT_APP_MAPKIT_JWT);
 });

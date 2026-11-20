@@ -4,7 +4,7 @@ import Map, { Marker, NavigationControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { collapseMobileAttribution } from './mapAttribution';
 
-function canUseAppleMap(token) {
+function canUseAppleMap(token, hostname) {
   if (!token) return false;
 
   try {
@@ -13,7 +13,6 @@ function canUseAppleMap(token) {
     if (exp && exp * 1000 <= Date.now()) return false;
     if (!origin) return true;
 
-    const { hostname } = window.location;
     return origin.split(',').some(entry => {
       const domain = entry.trim().toLowerCase();
       return domain === '*' || domain === hostname ||
@@ -24,10 +23,20 @@ function canUseAppleMap(token) {
   }
 }
 
+export function getAppleMapToken(hostname) {
+  const isWhereOnEarth = hostname === 'whereonearth.world' || hostname === 'www.whereonearth.world';
+  const whereOnEarthToken = process.env.REACT_APP_MAPKIT_JWT_WHEREONEARTH;
+  const defaultToken = process.env.REACT_APP_MAPKIT_JWT;
+
+  if (isWhereOnEarth && canUseAppleMap(whereOnEarthToken, hostname)) return whereOnEarthToken;
+  if (canUseAppleMap(defaultToken, hostname)) return defaultToken;
+  return undefined;
+}
+
 export default function RoundMap({ pins, onPick, initialRegion, initialViewState, compactControls = false }) {
-  const appleToken = process.env.REACT_APP_MAPKIT_JWT;
+  const [appleToken] = useState(() => getAppleMapToken(window.location.hostname));
   const mapTilerKey = process.env.REACT_APP_MAPTILER_KEY;
-  const [useApple, setUseApple] = useState(() => canUseAppleMap(appleToken));
+  const [useApple, setUseApple] = useState(Boolean(appleToken));
   const [appleLoaded, setAppleLoaded] = useState(false);
 
   useEffect(() => {
